@@ -10,6 +10,18 @@
 --Paratrooper AKS-74
 --Paratrooper RPG-16
 
+--TRANSPORT CAPACITIES
+--BTR-80,BTR-81A,BMP-2,BMP-3: 7 Troops
+--BMP-1: 8 Troops
+--MTLB: 11 Troops
+--M2A2 Bradley: 7 Troops
+--Stryker: 9 Troops
+--LAV-25: 6 Troops
+--BMD-1 and BTR-RD: 6 Troops
+--Marder with Milan: 6, without 7
+--Warrior: 7
+--M-113: 11
+
 missionTransports = {}
 
 russianModernSquadBTR_BMP2_BMP3 =
@@ -274,11 +286,20 @@ function determineRandomSquad(hostVehicle)
 
 	if countryID == 0 or countryID == 1 or countryID == 16 or countryID == 17 or countryID == 18 or countryID == 19 then --East
 		if vehichleType == 'BTR-70' or vehichleType == 'BMP-2' or vehichleType == 'BMP-3' then
-
+			--randomize a number, and determine squad type corresponding to nation and number for this vehicle type, in this case, 7 men squads
+			squadTypeSeed = mist.random(7) --1 to 5 = rifle squad, 5 and 6 = rifle squad with 1 manpads, 7 = air defense squad with manpads cmd, 2 manpads, 4 riflemen
+			if squadTypeSeed < 5 then
+				initializeTransport(hostVehicle,russianRifleSquadBTR_BMP2_BMP3)
+			elseif squadTypeSeed < 7
+				initializeTransport(hostVehicle,russianModernSquadBTR_BMP2_BMP3)
 		elseif vehichleType == 'GAZ-66'
-
+			--trucks may not get any dismounts, depending on randomizer
 		elseif vehichleType == 'BMP-1'
-
+			squadTypeSeed = mist.random(7)
+			if squadTypeSeed < 5 then
+				initializeTransport(hostVehicle,russianSquadBMP1)
+			elseif squadTypeSeed < 7
+				initializeTransport(hostVehicle,russianSquadManpadsBMP1)
 		end --END vehichle type if for east
 	elseif --Insurgent
 
@@ -289,19 +310,26 @@ function determineRandomSquad(hostVehicle)
 end
 
 function assignSetSquadTypeToVehicle(hostVehicle, squadType)
-	-- squadType = mortarWest, mortarGrg, mortarRu, mortarIns, rifleWest, rifleGrg, rifleRu, rifleIns, manpadsWest, manpadsRu, manpadsIns, vdv, rpgIns, specificGroupNameFromMEditor:
+	--squadType = mortarWest, mortarGrg, mortarRu, mortarIns, rifleWest, rifleGrg, rifleRu, rifleIns, manpadsWest, manpadsRu, manpadsIns, vdv, rpgIns, specificGroupNameFromMEditor:
 end
 
 
 
-function initializeTransports()
-	missionTransports[#missionTransports + 1] = {
-			name = UnitName,
-			countryID = Unit.getByName(UnitName):getCountry(),
-			UnitID = Unit.getByName(UnitName):getID(),
-			cargo = dm_type,
+function initializeTransport(unitName,cargoSquad)
+	missionTransports[unitName] = {			
+			countryID = Unit.getByName(unitName):getCountry(),
+			UnitID = Unit.getByName(unitName):getID(),
+			cargo = cargoSquad,
 			cargo_status = "mounted"
 		}
+end
+
+function checkMovement()
+	for unitName, transportData in pairs(missionTransports) do
+		print(i)
+	end
+end
+
 end
 
 
