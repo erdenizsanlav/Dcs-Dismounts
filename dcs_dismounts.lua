@@ -23,262 +23,83 @@
 --M-113: 11
 
 missionTransports = {}
+dismountsInitiated = 0
 
 russianModernSquadBTR_BMP2_BMP3 =
 {
-	["hidden"] = false,
-	["units"] =
-	{
-		[1] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK"
-		},
-		[2] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK"
-		},
-		[3] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver2"
-		},
-		[4] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver3"
-		},
-		[5] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver2"
-		},
-		[6] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "SA-18 Igla manpad"
-		},
-		[7] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver3"
-		}
-	}
+	"Infantry AK",
+	"Infantry AK",
+	"Infantry AK ver2",
+	"Infantry AK ver3",
+	"Infantry AK ver2",
+	"SA-18 Igla manpad",
+	"Infantry AK ver3"	
 }--end of russianModernSquadBTR_BMP2_BMP3
 
 russianRifleSquadBTR_BMP2_BMP3 =
 {
-	["hidden"] = false,
-	["units"] =
-	{
-		[1] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK"
-		},
-		[2] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver2"
-		},
-		[3] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK"
-		},
-		[4] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver3"
-		},
-		[5] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver2"
-		},
-		[6] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver3"
-		},
-		[7] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver3"
-		}
-	}
+	"Infantry AK",
+	"Infantry AK ver2",
+	"Infantry AK",
+	"Infantry AK ver3",
+	"Infantry AK ver2",
+	"Infantry AK ver3",
+	"Infantry AK ver3"	
 }--end of russianRifleSquadBTR_BMP2_BMP3
 
 russianSquadBMP1 =
 {
-	["hidden"] = false,
-	["units"] =
-	{
-		[1] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK"
-		},
-		[2] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver2"
-		},
-		[3] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK"
-		},
-		[4] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver3"
-		},
-		[5] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver2"
-		},
-		[6] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver3"
-		},
-		[7] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver3"
-		},
-		[8] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver2"
-		}
-	}
+	"Infantry AK",
+	"Infantry AK ver2",
+	"Infantry AK",
+	"Infantry AK ver3",
+	"Infantry AK ver2",
+	"Infantry AK ver3",
+	"Infantry AK ver3",
+	"Infantry AK ver2"
 }--end of russianSquadBMP1
 
 russianSquadManpadsBMP1 =
 {
-	["hidden"] = false,
-	["units"] =
-	{
-		[1] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK"
-		},
-		[2] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver2"
-		},
-		[3] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "SA-18 Igla manpad"
-		},
-		[4] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver3"
-		},
-		[5] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver2"
-		},
-		[6] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver3"
-		},
-		[7] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver3"
-		},
-		[8] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Infantry AK ver2"
-		}
-	}
+	"Infantry AK",
+	"Infantry AK ver2",
+	"SA-18 Igla manpad",
+	"Infantry AK ver3",
+	"Infantry AK ver2",
+	"Infantry AK ver3",
+	"Infantry AK ver3",
+	"Infantry AK ver2"
 }--end of russianSquadManpadsBMP1
 
 russianVDVBMD1 =
 {
-	["hidden"] = false,
-	["units"] =
-	{
-		[1] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Paratrooper AKS-74"
-		},
-		[2] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Paratrooper RPG-16"
-		},
-		[3] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Paratrooper AKS-74"
-		},
-		[4] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Paratrooper AKS-74"
-		},
-		[5] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Paratrooper RPG-16"
-		},
-		[6] =
-		{
-			["skill"] = "Average",
-			["category"] = "vehichle",
-			["type"] = "Paratrooper AKS-74"
-		}
-	}
+	"Paratrooper AKS-74",
+	"Paratrooper RPG-16",
+	"Paratrooper AKS-74",
+	"Paratrooper AKS-74",
+	"Paratrooper RPG-16",
+	"Paratrooper AKS-74"
 }--end of russianVDVBMD1
+
+local function getHeading(Pos3)
+		if (Pos3.x.x > 0) and (Pos3.x.z == 0) then
+			return 0
+		elseif (Pos3.x.x > 0) and (Pos3.x.z > 0) then
+			return math.atan(Pos3.x.z / Pos3.x.x)
+		elseif (Pos3.x.x == 0) and (Pos3.x.z > 0) then
+			return math.rad(90)
+		elseif (Pos3.x.x < 0) and (Pos3.x.z > 0) then
+			return math.rad(90) - math.atan(Pos3.x.x / Pos3.x.z)
+		elseif (Pos3.x.x < 0) and (Pos3.x.z == 0) then
+			return math.rad(180)
+		elseif (Pos3.x.x < 0) and (Pos3.x.z < 0) then
+			return math.rad(180) + math.atan(Pos3.x.z / Pos3.x.x)
+		elseif (Pos3.x.x == 0) and (Pos3.x.z < 0) then
+			return math.rad(270)
+		elseif (Pos3.x.x > 0) and (Pos3.x.z < 0) then
+			return math.rad(270) - math.atan(Pos3.x.x / Pos3.x.z)
+		end
+end
 
 function determineRandomSquad(hostVehicle)
 	countryId = Unit.getByName(hostVehicle):getCountry()
@@ -306,7 +127,6 @@ function determineRandomSquad(hostVehicle)
 	else --West
 
 	end --END country type
-
 end
 
 function assignSetSquadTypeToVehicle(hostVehicle, squadType)
@@ -324,14 +144,111 @@ function initializeTransport(unitName,cargoSquad)
 		}
 end
 
+function spawnSquad(hostVehicle)
+	transportVehicle = missionTransports[hostVehicle]	
+
+	if transportVehicle ~= nil then
+		local dismountingTransport = Unit.getByName(unitName)
+		local carrierPos = dismountingTransport:getPosition()
+		local dmVec2 = {
+			x = carrierPos.p.x + carrierPos.x.x * -5,
+			y = carrierPos.p.z + carrierPos.x.z * -5,
+		}
+		local heading = getHeading(carrierPos)
+		if transportVehicle.cargo ~= nil then
+			local groupData = local group = {
+					["visible"] = false,
+					["route"] = 
+					{
+						["spans"] = 
+						{
+						}, -- end of ["spans"]
+						["points"] = 
+						{
+							[1] = 
+							{
+								["alt"] = 0,
+								["type"] = "Turning Point",
+								["ETA"] = 0,
+								["alt_type"] = "BARO",
+								["formation_template"] = "",
+								["y"] = dmVec2.y,
+								["x"] = dmVec2.x,
+								["ETA_locked"] = true,
+								["speed"] = 5.5555555555556,
+								["action"] = "Off Road",
+								["task"] = 
+								{
+									["id"] = "ComboTask",
+									["params"] = 
+									{
+										["tasks"] = 
+										{
+										}, -- end of ["tasks"]
+									}, -- end of ["params"]
+								}, -- end of ["task"]
+								["speed_locked"] = true,
+							}, -- end of [1]
+						}, -- end of ["points"]
+					}, -- end of ["route"]
+					["groupId"] = carrierUnitID + 10000,
+					["tasks"] = 
+					{
+					}, -- end of ["tasks"]
+					["hidden"] = false,
+					["units"] = 
+					{
+						
+					}, -- end of ["units"]
+					["y"] = dmVec2.y,
+					["x"] = dmVec2.x,
+					["name"] = "Dismounts_" .. carrierUnitID,
+					["start_time"] = 0,
+					["task"] = "Ground Nothing",
+				}
+			for i=1,#transportVehicle.cargo do
+				print(i)
+			end
+		end
+	else
+		return 0;
+	end
+
+	coalition.addGroup(missionTransports[unitName].countryID, Group.Category.GROUND, group)
+end
+
+function despawnSquad(hostVehicle)
+	-- body
+end
+
 function checkMovement()
 	for unitName, transportData in pairs(missionTransports) do
-		print(i)
+		local dismountingTransport = Unit.getByName(unitName)
+		if dismountingTransport ~= nil then
+				local v = dismountingTransport:getVelocity()	--Velocity is a Vec3
+				if v.x == 0 and v.y == 0 and v.z == 0 then	--Check if speed is zero
+					if missionTransports[unitName].cargo_status == "mounted" then
+						
+						local group = GetDmGroup(missionTransports[unitName].countryID, missionTransports[unitName].UnitID, carrierPos, missionTransports[unitName].cargo, missionTransports[unitName].name)
+						spawnSquad(unitName)
+						missionTransports[unitName].cargo_status = "dismounted"
+					end
+				else	--Else carrier is moving
+					if missionTransports[unitName].cargo_status == "dismounted" then
+						if missionTransports[unitName].cargo ~= "Rifle" or math.sqrt(v.x * v.x + v.z * v.z) > 5.3 then	--Remount rifle squad only when speed bigger than 5.3 m/s (19 kph). Remount everyone else immediately when moving.
+							local g = Group.getByName("Dismounts_" .. DismountsCarrier[n].UnitID)
+							if g ~= nil then	--Check if the group is still alive
+								DismountsCarrier[n].cargo_status = "mounted"
+								g:destroy()
+							else
+								DismountsCarrier[n].cargo_status = "lost"	--If the dismounted group is destroyed, set status of the carrier to lost to prevent it from deploying a new group
+							end
+						end
+					end
+				end
+		end
 	end
 end
-
-end
-
 
 function testSpawn()
 	
