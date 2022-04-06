@@ -34,7 +34,7 @@ russianModernSquadBTR_BMP2_BMP3 =
 	"Infantry AK ver2",
 	"Infantry AK ver3",
 	"Infantry AK ver2",
-	"SA-18 Igla manpad",
+	"SA-18 Igla-S manpad",
 	"Infantry AK ver3"	
 }--end of russianModernSquadBTR_BMP2_BMP3
 
@@ -48,6 +48,17 @@ russianRifleSquadBTR_BMP2_BMP3 =
 	"Infantry AK ver3",
 	"Infantry AK ver3"	
 }--end of russianRifleSquadBTR_BMP2_BMP3
+
+russianManpadsCmdSquadBTR_BMP2_BMP3 =
+{
+	"SA-18 Igla-S comm",
+	"Infantry AK",
+	"SA-18 Igla-S manpad",
+	"Infantry AK ver2",
+	"Infantry AK ver3",
+	"SA-18 Igla-S manpad",
+	"Infantry AK ver3"	
+}--end of russianManpadsCmdSquadBTR_BMP2_BMP3
 
 russianSquadBMP1 =
 {
@@ -65,13 +76,25 @@ russianSquadManpadsBMP1 =
 {
 	"Infantry AK",
 	"Infantry AK ver2",
-	"SA-18 Igla manpad",
+	"SA-18 Igla-S manpad",
 	"Infantry AK ver3",
 	"Infantry AK ver2",
 	"Infantry AK ver3",
 	"Infantry AK ver3",
 	"Infantry AK ver2"
 }--end of russianSquadManpadsBMP1
+
+russianSquadManpadsCmdBMP1 =
+{
+	"SA-18 Igla-S comm",
+	"Infantry AK ver2",
+	"SA-18 Igla-S manpad",
+	"Infantry AK ver3",
+	"Infantry AK ver2",
+	"SA-18 Igla-S manpad",
+	"Infantry AK ver3",
+	"Infantry AK ver2"
+}--end of russianSquadManpadsCmdBMP1
 
 russianVDVBMD1 =
 {
@@ -104,49 +127,55 @@ local function getHeading(Pos3)
 end
 
 local function initializeTransport(unitName,cargoSquad)
-	trigger.action.outText('Cargo:' .. #cargoSquad, 20)
+	--trigger.action.outText('Cargo:' .. #cargoSquad, 20)
 	unitId = Unit.getByName(unitName):getID()
 
 	missionTransports[unitName] = {			
 			countryID = Unit.getByName(unitName):getCountry(),
 			UnitID = Unit.getByName(unitName):getID(),
 			cargo = cargoSquad,
-			cargo_status = "mounted",
+			cargo_status = "mounted"
 	}
-	trigger.action.outText('missionTransports:' .. #missionTransports, 20)
-	trigger.action.outText('unit name:' .. unitName, 20)
-	trigger.action.outText('unit id:' .. unitId, 20)
-	trigger.action.outText('data cargo:' .. missionTransports[unitName].cargo_status, 20)
+	--trigger.action.outText('missionTransports:' .. #missionTransports, 20)
+	--trigger.action.outText('unit name:' .. unitName, 20)
+	--trigger.action.outText('unit id:' .. unitId, 20)
+	--trigger.action.outText('data cargo:' .. missionTransports[unitName].cargo_status, 20)
 end
 
 function determineRandomSquad(hostVehicle)
 	countryId = Unit.getByName(hostVehicle):getCountry()
 	vehichleType = Unit.getByName(hostVehicle):getTypeName()
 
-	trigger.action.outText('CountryID:' .. countryId, 20)
-	trigger.action.outText(vehichleType, 20)
+	--trigger.action.outText('CountryID:' .. countryId, 20)
+	--trigger.action.outText(vehichleType, 20)
 
 	if countryId == 0 or countryId == 1 or countryId == 16 or countryId == 17 or countryId == 18 or countryId == 19 then --East
 		if vehichleType == 'BTR-80' or vehichleType == 'BMP-2' or vehichleType == 'BMP-3' then
 			--randomize a number, and determine squad type corresponding to nation and number for this vehicle type, in this case, 7 men squads
 			squadTypeSeed = mist.random(7) --1 to 5 = rifle squad, 5 and 6 = rifle squad with 1 manpads, 7 = air defense squad with manpads cmd, 2 manpads, 4 riflemen
-			trigger.action.outText('seed:' .. squadTypeSeed, 20)
+			--trigger.action.outText('seed:' .. squadTypeSeed, 20)
 			if squadTypeSeed < 5 then
 				initializeTransport(hostVehicle,russianRifleSquadBTR_BMP2_BMP3)
 			elseif squadTypeSeed < 7 then
 				initializeTransport(hostVehicle,russianModernSquadBTR_BMP2_BMP3)
+			else
+				initializeTransport(hostVehicle,russianManpadsCmdSquadBTR_BMP2_BMP3)
 			end
 		elseif vehichleType == 'GAZ-66' then
 			--trucks may not get any dismounts, depending on randomizer
 			return 0
 		elseif vehichleType == 'BMP-1' then
 			squadTypeSeed = mist.random(7)
-			trigger.action.outText('seed:' .. squadTypeSeed, 20)
+			--trigger.action.outText('seed:' .. squadTypeSeed, 20)
 			if squadTypeSeed < 5 then
 				initializeTransport(hostVehicle,russianSquadBMP1)
 			elseif squadTypeSeed < 7 then
 				initializeTransport(hostVehicle,russianSquadManpadsBMP1)
+			else
+				initializeTransport(hostVehicle,russianSquadManpadsCmdBMP1)
 			end
+		elseif vehichleType == 'BMD-1' or vehichleType == 'BTR_D' then
+			initializeTransport(hostVehicle,russianVDVBMD1)
 		end --END vehichle type if for east
 	--elseif --Insurgent
 	--	return 0
@@ -160,12 +189,15 @@ function assignSetSquadTypeToVehicle(hostVehicle, squadType)
 end
 
 local function spawnSquad(hostVehicle)
-	transportVehicle = missionTransports[hostVehicle]	
+	transportVehicle = missionTransports[hostVehicle]
+	--trigger.action.outText('Spawning squad', 20)
 
 	if transportVehicle ~= nil then
 		local dismountingTransport = Unit.getByName(hostVehicle)
 		local carrierPos = dismountingTransport:getPosition()
 		local carrierUnitID = transportVehicle.UnitID
+
+		--trigger.action.outText('Vehicle found', 20)
 
 		local dmVec2 = {
 			x = carrierPos.p.x + carrierPos.x.x * -5,
@@ -206,6 +238,30 @@ local function spawnSquad(hostVehicle)
 								}, -- end of ["task"]
 								["speed_locked"] = true,
 							}, -- end of [1]
+							[2] = 
+							{
+								["alt"] = 0,
+								["type"] = "Turning Point",
+								["ETA"] = 0,
+								["alt_type"] = "BARO",
+								["formation_template"] = "",
+								["y"] = dmVec2.y + 45,
+								["x"] = dmVec2.x + 55,
+								["ETA_locked"] = false,
+								["speed"] = 5.5555555555556,
+								["action"] = "Off Road",
+								["task"] = 
+								{
+									["id"] = "ComboTask",
+									["params"] = 
+									{
+										["tasks"] = 
+										{
+										}, -- end of ["tasks"]
+									}, -- end of ["params"]
+								}, -- end of ["task"]
+								["speed_locked"] = true,
+							}, -- end of [2]
 						}, -- end of ["points"]
 					}, -- end of ["route"]
 					["groupId"] = hostVehicle .. 10000,
@@ -246,29 +302,51 @@ local function spawnSquad(hostVehicle)
 end
 
 local function despawnSquad(hostVehicle)
-	-- body
+	local g = Group.getByName("Dismounts_" .. hostVehicle)
+	local initialSize = g:getInitialSize()
+	local currentSize = g:getUnits()
+	if initialSize > #currentSize then
+		--trigger.action.outText(hostVehicle .. ' dismounts were ' .. initialSize .. ' remaining ' .. #currentSize, 10)
+		local remainingInfantry = {}
+		for i=1,#currentSize do
+			--trigger.action.outText(currentSize[i]:getTypeName(),10)
+			table.insert(remainingInfantry, currentSize[i]:getTypeName())
+		end
+		--trigger.action.outText(#remainingInfantry,10)
+		missionTransports[hostVehicle].cargo = remainingInfantry
+	end
 end
 
 local function checkMovement()
-	trigger.action.outText('checking movement', 2)
-	trigger.action.outText(#missionTransports, 2)
+	--trigger.action.outText('checking movement', 2)
+	--trigger.action.outText(#missionTransports, 2)
 	for unitName, transportData in pairs(missionTransports) do
 		local dismountingTransport = Unit.getByName(unitName)
-		trigger.action.outText('unit:' .. unitName, 2)
+		--trigger.action.outText('unit:' .. unitName, 2)
+		--trigger.action.outText('cargo:' .. #transportData.cargo , 2)
+		--trigger.action.outText('status:' .. transportData.cargo_status, 2)
 		if dismountingTransport ~= nil then
 				unitId = Unit.getByName(unitName):getID()
+				--trigger.action.outText('unit:' .. unitName .. ' is deploying troops if stopped', 2)
+
 				local v = dismountingTransport:getVelocity()	--Velocity is a Vec3
-				if v.x == 0 and v.y == 0 and v.z == 0 then	--Check if speed is zero
-					if missionTransports[unitName].cargo_status == "mounted" then
+				local spd = mist.vec.mag(v)
+
+				--trigger.action.outText('its speed is ' .. spd .. ' (' .. v.x .. ' ' .. v.y .. ' ' .. v.z .. ')', 2)
+				
+
+				if spd < 1 then	--Check if speed is zero
+					if transportData.cargo_status == "mounted" then
 						spawnSquad(unitName)
 						missionTransports[unitName].cargo_status = "dismounted"
 					end
 				else	--Else carrier is moving
-					if missionTransports[unitName].cargo_status == "dismounted" then
-						if missionTransports[unitName].cargo ~= "Rifle" or math.sqrt(v.x * v.x + v.z * v.z) > 5.3 then	--Remount rifle squad only when speed bigger than 5.3 m/s (19 kph). Remount everyone else immediately when moving.
-							local g = Group.getByName("Dismounts_" .. DismountsCarrier[n].UnitID)
+					if transportData.cargo_status == "dismounted" then
+						if spd > 2.3 then
+							local g = Group.getByName("Dismounts_" .. unitName)
 							if g ~= nil then	--Check if the group is still alive
 								missionTransports[unitName].cargo_status = "mounted"
+								despawnSquad(unitName)
 								g:destroy()
 							else
 								missionTransports[unitName].cargo_status = "lost"	--If the dismounted group is destroyed, set status of the carrier to lost to prevent it from deploying a new group
@@ -276,6 +354,9 @@ local function checkMovement()
 						end
 					end
 				end
+		else
+			trigger.action.outText('wow sth wrong for vehichle:' .. unitName, 2)
+			--TODO: remove this entry from missionTransports table
 		end
 	end
 	return timer.getTime() + 5
