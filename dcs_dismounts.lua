@@ -22,7 +22,9 @@
 --Warrior: 7
 --M-113: 11
 
-missionTransports = {}
+do
+
+local missionTransports = {}
 dismountsInitiated = 0
 
 russianModernSquadBTR_BMP2_BMP3 =
@@ -101,31 +103,55 @@ local function getHeading(Pos3)
 		end
 end
 
+local function initializeTransport(unitName,cargoSquad)
+	trigger.action.outText('Cargo:' .. #cargoSquad, 20)
+	unitId = Unit.getByName(unitName):getID()
+
+	missionTransports[unitName] = {			
+			countryID = Unit.getByName(unitName):getCountry(),
+			UnitID = Unit.getByName(unitName):getID(),
+			cargo = cargoSquad,
+			cargo_status = "mounted",
+	}
+	trigger.action.outText('missionTransports:' .. #missionTransports, 20)
+	trigger.action.outText('unit name:' .. unitName, 20)
+	trigger.action.outText('unit id:' .. unitId, 20)
+	trigger.action.outText('data cargo:' .. missionTransports[unitName].cargo_status, 20)
+end
+
 function determineRandomSquad(hostVehicle)
 	countryId = Unit.getByName(hostVehicle):getCountry()
-	vehichleType = Object.getTypeName(hostVehicle)
+	vehichleType = Unit.getByName(hostVehicle):getTypeName()
 
-	if countryID == 0 or countryID == 1 or countryID == 16 or countryID == 17 or countryID == 18 or countryID == 19 then --East
-		if vehichleType == 'BTR-70' or vehichleType == 'BMP-2' or vehichleType == 'BMP-3' then
+	trigger.action.outText('CountryID:' .. countryId, 20)
+	trigger.action.outText(vehichleType, 20)
+
+	if countryId == 0 or countryId == 1 or countryId == 16 or countryId == 17 or countryId == 18 or countryId == 19 then --East
+		if vehichleType == 'BTR-80' or vehichleType == 'BMP-2' or vehichleType == 'BMP-3' then
 			--randomize a number, and determine squad type corresponding to nation and number for this vehicle type, in this case, 7 men squads
 			squadTypeSeed = mist.random(7) --1 to 5 = rifle squad, 5 and 6 = rifle squad with 1 manpads, 7 = air defense squad with manpads cmd, 2 manpads, 4 riflemen
+			trigger.action.outText('seed:' .. squadTypeSeed, 20)
 			if squadTypeSeed < 5 then
 				initializeTransport(hostVehicle,russianRifleSquadBTR_BMP2_BMP3)
-			elseif squadTypeSeed < 7
+			elseif squadTypeSeed < 7 then
 				initializeTransport(hostVehicle,russianModernSquadBTR_BMP2_BMP3)
-		elseif vehichleType == 'GAZ-66'
+			end
+		elseif vehichleType == 'GAZ-66' then
 			--trucks may not get any dismounts, depending on randomizer
-		elseif vehichleType == 'BMP-1'
+			return 0
+		elseif vehichleType == 'BMP-1' then
 			squadTypeSeed = mist.random(7)
+			trigger.action.outText('seed:' .. squadTypeSeed, 20)
 			if squadTypeSeed < 5 then
 				initializeTransport(hostVehicle,russianSquadBMP1)
-			elseif squadTypeSeed < 7
+			elseif squadTypeSeed < 7 then
 				initializeTransport(hostVehicle,russianSquadManpadsBMP1)
+			end
 		end --END vehichle type if for east
-	elseif --Insurgent
-
+	--elseif --Insurgent
+	--	return 0
 	else --West
-
+		return 0
 	end --END country type
 end
 
@@ -133,30 +159,21 @@ function assignSetSquadTypeToVehicle(hostVehicle, squadType)
 	--squadType = mortarWest, mortarGrg, mortarRu, mortarIns, rifleWest, rifleGrg, rifleRu, rifleIns, manpadsWest, manpadsRu, manpadsIns, vdv, rpgIns, specificGroupNameFromMEditor:
 end
 
-
-
-function initializeTransport(unitName,cargoSquad)
-	missionTransports[unitName] = {			
-			countryID = Unit.getByName(unitName):getCountry(),
-			UnitID = Unit.getByName(unitName):getID(),
-			cargo = cargoSquad,
-			cargo_status = "mounted"
-		}
-end
-
-function spawnSquad(hostVehicle)
+local function spawnSquad(hostVehicle)
 	transportVehicle = missionTransports[hostVehicle]	
 
 	if transportVehicle ~= nil then
-		local dismountingTransport = Unit.getByName(unitName)
+		local dismountingTransport = Unit.getByName(hostVehicle)
 		local carrierPos = dismountingTransport:getPosition()
+		local carrierUnitID = transportVehicle.UnitID
+
 		local dmVec2 = {
 			x = carrierPos.p.x + carrierPos.x.x * -5,
 			y = carrierPos.p.z + carrierPos.x.z * -5,
 		}
 		local heading = getHeading(carrierPos)
 		if transportVehicle.cargo ~= nil then
-			local groupData = local group = {
+			local groupData = {
 					["visible"] = false,
 					["route"] = 
 					{
@@ -191,7 +208,7 @@ function spawnSquad(hostVehicle)
 							}, -- end of [1]
 						}, -- end of ["points"]
 					}, -- end of ["route"]
-					["groupId"] = carrierUnitID + 10000,
+					["groupId"] = hostVehicle .. 10000,
 					["tasks"] = 
 					{
 					}, -- end of ["tasks"]
@@ -202,34 +219,47 @@ function spawnSquad(hostVehicle)
 					}, -- end of ["units"]
 					["y"] = dmVec2.y,
 					["x"] = dmVec2.x,
-					["name"] = "Dismounts_" .. carrierUnitID,
+					["name"] = "Dismounts_" .. hostVehicle,
 					["start_time"] = 0,
 					["task"] = "Ground Nothing",
-				}
+			}
+			local vehiclesList = {}
+
 			for i=1,#transportVehicle.cargo do
-				print(i)
+				vehiclesList[i] = {
+						["y"] = dmVec2.y,
+						["type"] = transportVehicle.cargo[i],
+						["name"] = "Dismounts_" .. hostVehicle .. "_01",
+						["unitId"] = carrierUnitID + 10000,
+						["heading"] = 0,
+						["playerCanDrive"] = true,
+						["skill"] = "Average",
+						["x"] = dmVec2.x + i,
+				}
 			end
+			groupData["units"] = vehiclesList
+			coalition.addGroup(missionTransports[hostVehicle].countryID, Group.Category.GROUND, groupData)
 		end
 	else
 		return 0;
-	end
-
-	coalition.addGroup(missionTransports[unitName].countryID, Group.Category.GROUND, group)
+	end	
 end
 
-function despawnSquad(hostVehicle)
+local function despawnSquad(hostVehicle)
 	-- body
 end
 
-function checkMovement()
+local function checkMovement()
+	trigger.action.outText('checking movement', 2)
+	trigger.action.outText(#missionTransports, 2)
 	for unitName, transportData in pairs(missionTransports) do
 		local dismountingTransport = Unit.getByName(unitName)
+		trigger.action.outText('unit:' .. unitName, 2)
 		if dismountingTransport ~= nil then
+				unitId = Unit.getByName(unitName):getID()
 				local v = dismountingTransport:getVelocity()	--Velocity is a Vec3
 				if v.x == 0 and v.y == 0 and v.z == 0 then	--Check if speed is zero
 					if missionTransports[unitName].cargo_status == "mounted" then
-						
-						local group = GetDmGroup(missionTransports[unitName].countryID, missionTransports[unitName].UnitID, carrierPos, missionTransports[unitName].cargo, missionTransports[unitName].name)
 						spawnSquad(unitName)
 						missionTransports[unitName].cargo_status = "dismounted"
 					end
@@ -238,19 +268,19 @@ function checkMovement()
 						if missionTransports[unitName].cargo ~= "Rifle" or math.sqrt(v.x * v.x + v.z * v.z) > 5.3 then	--Remount rifle squad only when speed bigger than 5.3 m/s (19 kph). Remount everyone else immediately when moving.
 							local g = Group.getByName("Dismounts_" .. DismountsCarrier[n].UnitID)
 							if g ~= nil then	--Check if the group is still alive
-								DismountsCarrier[n].cargo_status = "mounted"
+								missionTransports[unitName].cargo_status = "mounted"
 								g:destroy()
 							else
-								DismountsCarrier[n].cargo_status = "lost"	--If the dismounted group is destroyed, set status of the carrier to lost to prevent it from deploying a new group
+								missionTransports[unitName].cargo_status = "lost"	--If the dismounted group is destroyed, set status of the carrier to lost to prevent it from deploying a new group
 							end
 						end
 					end
 				end
 		end
 	end
+	return timer.getTime() + 5
 end
 
-function testSpawn()
-	
-	mist.dynAdd()
+timer.scheduleFunction(checkMovement, nil, timer.getTime() + 1)
+
 end
