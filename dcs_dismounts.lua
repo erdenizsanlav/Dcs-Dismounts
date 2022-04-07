@@ -471,6 +471,22 @@ function assignSetSquadTypeToVehicle(hostVehicle, squadType)
 	end
 end
 
+function mechanizeAll()
+	local units = mist.makeUnitTable({'[all][vehicle]'})
+	for i=1,#units do
+		local unit = Unit.getByName(units[i])
+		if unit ~= nil then
+			local unitType = unit:getTypeName()
+			if unitType == 'BTR-80' or unitType == 'BMP-2' or unitType == 'BMP-3' or unitType == 'BMP-1' or unitType == 'BTR-82A' or
+			unitType == 'BMD-1' or unitType == 'BTR_D' or unitType == 'MTLB' or unitType == 'M-2 Bradley' or unitType == 'Marder' or 
+			unitType == 'MCV-80' or unitType == 'LAV-25' or unitType == 'M-113' or unitType == 'M1126 Stryker ICV' then
+				determineRandomSquad(units[i])
+			end
+		end
+	end
+end
+
+
 local function spawnSquad(hostVehicle)
 	transportVehicle = missionTransports[hostVehicle]
 	--trigger.action.outText('Spawning squad', 20)
