@@ -21,6 +21,13 @@
 --Marder with Milan: 6, without 7
 --Warrior: 7
 --M-113: 11
+--AAV-7: 21 (hoooly schmallies!)
+--Tpz Fuchs: 10
+--Sdkfz 251
+--M2 Halftrack
+--Sdkfz 7
+
+--Questioned: Merkava? M6 Linebacker?
 
 do
 
@@ -106,6 +113,193 @@ russianVDVBMD1 =
 	"Paratrooper AKS-74"
 }--end of russianVDVBMD1
 
+russianSquadMTLB =
+{
+	"Infantry AK",
+	"Infantry AK",
+	"Infantry AK ver3",
+	"Infantry AK ver2",
+	"Infantry AK ver3",
+	"Infantry AK ver3",
+	"Infantry AK ver2",
+	"Infantry AK ver2",
+	"Infantry AK",
+	"Infantry AK ver2",
+	"Infantry AK ver3"
+}
+
+russianSquadManpadsMTLB =
+{
+	"Infantry AK ver3",
+	"Infantry AK",
+	"Infantry AK ver2",
+	"Infantry AK",
+	"SA-18 Igla-S manpad",
+	"Infantry AK ver3",
+	"Infantry AK ver2",
+	"Infantry AK ver2",
+	"Infantry AK",
+	"Infantry AK ver3",
+	"Infantry AK"
+}
+
+russianSquadRPGMTLB =
+{
+	"Infantry AK",
+	"Infantry AK",
+	"Infantry AK ver3",
+	"Paratrooper RPG-16",
+	"Infantry AK ver3",
+	"Infantry AK ver2",
+	"Paratrooper RPG-16",
+	"Infantry AK ver3",
+	"Infantry AK",
+	"Infantry AK ver2",
+	"Infantry AK ver3"
+}
+
+russianSquadRPGIglaMTLB =
+{
+	"Infantry AK",
+	"Infantry AK",
+	"Infantry AK ver3",
+	"Paratrooper RPG-16",
+	"SA-18 Igla-S manpad",
+	"Infantry AK ver2",
+	"Paratrooper RPG-16",
+	"Infantry AK ver3",
+	"Infantry AK ver2",
+	"Infantry AK",
+	"Infantry AK ver3"
+}
+
+russianSquadAntiAirMTLB =
+{
+	"Infantry AK ver3",
+	"Infantry AK ver2",
+	"Infantry AK",
+	"SA-18 Igla-S manpad",
+	"Infantry AK ver3",
+	"Infantry AK ver2",
+	"SA-18 Igla-S manpad",
+	"Infantry AK ver3",
+	"Infantry AK",
+	"Infantry AK ver2",
+	"SA-18 Igla-S manpad"
+}
+
+usaSquadLAV25 =
+{
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249"
+}
+
+usaSquadManpadsLAV25 =
+{
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier stinger",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249"
+}
+
+usaSquadManpadsBradleyMarder =
+{
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier stinger",
+	"Soldier M4"
+}
+
+usaSquadBradleyMarderWarrior =
+{
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M4"
+}
+
+usaSquadStryker =
+{
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249"
+}
+
+usaSquadManpadsStryker =
+{
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier stinger",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249"
+}
+
+usaFireteamStryker =
+{
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M249",
+	"Soldier M249",
+	"Soldier M4",
+	"Soldier stinger",
+	"Soldier M4",
+	"Soldier stinger",
+	"Soldier M249"
+}
+
+usaSquadManpadsM113 =
+{
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier stinger",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M4",
+	"Soldier M249"
+}
+
+usaSquadM113 =
+{
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M4",
+	"Soldier M249"
+}
+
+
 local function getHeading(Pos3)
 		if (Pos3.x.x > 0) and (Pos3.x.z == 0) then
 			return 0
@@ -150,9 +344,9 @@ function determineRandomSquad(hostVehicle)
 	--trigger.action.outText(vehichleType, 20)
 
 	if countryId == 0 or countryId == 1 or countryId == 16 or countryId == 17 or countryId == 18 or countryId == 19 then --East
-		if vehichleType == 'BTR-80' or vehichleType == 'BMP-2' or vehichleType == 'BMP-3' then
+		if vehichleType == 'BTR-80' or vehichleType == 'BMP-2' or vehichleType == 'BMP-3' or vehichleType == 'BTR-82A' then
 			--randomize a number, and determine squad type corresponding to nation and number for this vehicle type, in this case, 7 men squads
-			squadTypeSeed = mist.random(7) --1 to 5 = rifle squad, 5 and 6 = rifle squad with 1 manpads, 7 = air defense squad with manpads cmd, 2 manpads, 4 riflemen
+			squadTypeSeed = mist.random(7) --1 to 5 = rifle squad, 5 and 6 = rifle squad with 1 manpads, 7 = air defense squad with manpads cmd+2 manpads+4 riflemen
 			--trigger.action.outText('seed:' .. squadTypeSeed, 20)
 			if squadTypeSeed < 5 then
 				initializeTransport(hostVehicle,russianRifleSquadBTR_BMP2_BMP3)
@@ -176,16 +370,105 @@ function determineRandomSquad(hostVehicle)
 			end
 		elseif vehichleType == 'BMD-1' or vehichleType == 'BTR_D' then
 			initializeTransport(hostVehicle,russianVDVBMD1)
+		elseif vehichleType == 'MTLB' then
+			squadTypeSeed = mist.random(9)
+			if squadTypeSeed < 4 then
+				initializeTransport(hostVehicle,russianSquadMTLB)
+			elseif squadTypeSeed < 6 then
+				initializeTransport(hostVehicle,russianSquadManpadsMTLB)
+			elseif squadTypeSeed < 8 then
+				initializeTransport(hostVehicle,russianSquadRPGMTLB)
+			elseif squadTypeSeed < 9 then
+				initializeTransport(hostVehicle,russianSquadRPGIglaMTLB)
+			else
+				initializeTransport(hostVehicle,russianSquadAntiAirMTLB)
+			end
 		end --END vehichle type if for east
 	--elseif --Insurgent
 	--	return 0
 	else --West
-		return 0
+		if vehichleType == 'M-2 Bradley' or vehichleType == 'Marder' or vehichleType == 'MCV-80' then
+			--randomize a number, and determine squad type corresponding to nation and number for this vehicle type, in this case, 7 men squads
+			squadTypeSeed = mist.random(7) --1 to 4 = rifle squad, 5 and 6 = rifle squad with 1 manpads, 7 = air defense squad with manpads cmd+2 manpads+4 riflemen
+			--trigger.action.outText('seed:' .. squadTypeSeed, 20)
+			if squadTypeSeed < 5 then
+				initializeTransport(hostVehicle,usaSquadBradleyMarderWarrior)
+			elseif squadTypeSeed < 7 then
+				initializeTransport(hostVehicle,usaSquadManpadsBradleyMarder)
+			else
+				initializeTransport(hostVehicle,usaSquadManpadsBradleyMarder)
+			end
+		elseif vehichleType == 'GAZ-66' then
+			--trucks may not get any dismounts, depending on randomizer
+			return 0
+		elseif vehichleType == 'LAV-25' then
+			squadTypeSeed = mist.random(7)
+			--trigger.action.outText('seed:' .. squadTypeSeed, 20)
+			if squadTypeSeed < 5 then
+				initializeTransport(hostVehicle,usaSquadLAV25)
+			elseif squadTypeSeed < 7 then
+				initializeTransport(hostVehicle,usaSquadManpadsLAV25)
+			--else
+			--	initializeTransport(hostVehicle,russianSquadManpadsCmdBMP1)
+			end
+		elseif vehichleType == 'M-113' then
+			squadTypeSeed = mist.random(5)
+			if squadTypeSeed < 4 then
+				initializeTransport(hostVehicle,usaSquadM113)
+			else
+				initializeTransport(hostVehicle,usaSquadManpadsM113)
+			end
+		elseif vehichleType == 'M1126 Stryker ICV' then
+			squadTypeSeed = mist.random(9)
+			if squadTypeSeed < 5 then
+				initializeTransport(hostVehicle,usaSquadStryker)
+			elseif squadTypeSeed < 8 then
+				initializeTransport(hostVehicle,usaSquadManpadsStryker)			
+			else
+				initializeTransport(hostVehicle,usaFireteamStryker)
+			end
+		end --END vehichle type if for west
 	end --END country type
 end
 
 function assignSetSquadTypeToVehicle(hostVehicle, squadType)
-	--squadType = mortarWest, mortarGrg, mortarRu, mortarIns, rifleWest, rifleGrg, rifleRu, rifleIns, manpadsWest, manpadsRu, manpadsIns, vdv, rpgIns, specificGroupNameFromMEditor:
+	--squadType = mortarWest, mortarGrg, mortarRu, mortarIns, rifleWest, rifleGrg, rifleRu, rifleIns, manpadsWest, manpadsRu, manpadsIns, vdv, rpgIns, antiAir, special, specificGroupNameFromMEditor:	
+	local vehicle = Unit.getByName(hostVehicle)
+	local vehichleType = Unit.getByName(hostVehicle):getTypeName()	
+
+	if vehicle ~= nil then
+		--vehicles with 7 passenger capacity
+		if vehichleType == 'BTR-80' or vehichleType == 'BMP-2' or vehichleType == 'BMP-3' or vehichleType == 'BTR-82A' or vehichleType == 'M-2 Bradley' or vehichleType == 'Marder' or vehichleType == 'MCV-80' then
+			if squadType == 'rifleWest' then
+				initializeTransport(hostVehicle,usaSquadBradleyMarderWarrior)
+			elseif squadType == 'rifleRu' then
+				initializeTransport(hostVehicle,russianRifleSquadBTR_BMP2_BMP3)
+			elseif squadType == 'rifleIns' then
+				initializeTransport(hostVehicle,russianRifleSquadBTR_BMP2_BMP3)
+			elseif squadType == 'manpadsWest' then
+				initializeTransport(hostVehicle,usaSquadManpadsBradleyMarder)
+			elseif squadType == 'manpadsRu' then
+				initializeTransport(hostVehicle,russianModernSquadBTR_BMP2_BMP3)
+			elseif squadType == 'manpadsIns' then
+				initializeTransport(hostVehicle,russianModernSquadBTR_BMP2_BMP3)
+			end
+		--vehicles with 11 passenger capacity
+		elseif vehichleType == 'M-113' or vehichleType == 'MTLB' then
+			if squadType == 'rifleWest' then
+				initializeTransport(hostVehicle,usaSquadM113)
+			elseif squadType == 'rifleRu' then
+				initializeTransport(hostVehicle,russianSquadMTLB)
+			elseif squadType == 'rifleIns' then
+				initializeTransport(hostVehicle,russianSquadMTLB)
+			elseif squadType == 'manpadsWest' then
+				initializeTransport(hostVehicle,usaSquadManpadsM113)
+			elseif squadType == 'manpadsRu' then
+				initializeTransport(hostVehicle,russianSquadManpadsMTLB)
+			elseif squadType == 'manpadsIns' then
+				initializeTransport(hostVehicle,russianSquadManpadsMTLB)
+			end
+		end
+	end
 end
 
 local function spawnSquad(hostVehicle)
