@@ -880,7 +880,7 @@ function mechanizeAll()
 			local unitType = unit:getTypeName()
 			if unitType == 'BTR-80' or unitType == 'BMP-2' or unitType == 'BMP-3' or unitType == 'BMP-1' or unitType == 'BTR-82A' or
 			unitType == 'BMD-1' or unitType == 'BTR_D' or unitType == 'MTLB' or unitType == 'M-2 Bradley' or unitType == 'Marder' or 
-			unitType == 'MCV-80' or unitType == 'LAV-25' or unitType == 'M-113' or unitType == 'M1126 Stryker ICV' then
+			unitType == 'MCV-80' or unitType == 'LAV-25' or unitType == 'M-113' or unitType == 'M1126 Stryker ICV' or unitType == 'AAV7' then
 				determineRandomSquad(units[i])
 			end
 		end
