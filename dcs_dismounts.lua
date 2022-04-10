@@ -1,15 +1,3 @@
---IglaGRG_1
---IglaRUS_1
---Stinger_manpad
---IglaINS_1
---SA-18 Igla manpad
---Infantry AK
---Infantry AK ver2
---Infantry AK ver3
---2B11 mortar
---Paratrooper AKS-74
---Paratrooper RPG-16
-
 --TRANSPORT CAPACITIES
 --BTR-80,BTR-81A,BMP-2,BMP-3: 7 Troops
 --BMP-1: 8 Troops
@@ -155,7 +143,7 @@ russianSquadRPGMTLB =
 	"Infantry AK ver2",
 	"Paratrooper RPG-16",
 	"Infantry AK ver3",
-	"Infantry AK",
+	"Paratrooper RPG-16",
 	"Infantry AK ver2",
 	"Infantry AK ver3"
 }
@@ -351,6 +339,34 @@ usaSquadManpadsAAV7USMC =
 	"Soldier M4"
 }
 
+gerSquadTPz = 
+{
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M4"
+}
+
+gerSquadManpadsTPz = 
+{
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M249",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier stinger",
+	"Soldier M4"
+}
+
 insRifleSquadBTR_BMP2 =
 {
 	"Infantry AK Ins",
@@ -500,7 +516,7 @@ insSquadManpadsMTLB =
 {
 	"Infantry AK Ins",
 	"Infantry AK Ins",
-	"Soldier RPG",
+	"SA-18 Igla manpad",
 	"Infantry AK Ins",
 	"Soldier AK",
 	"Infantry AK Ins",
@@ -566,6 +582,36 @@ insSquadBMD1 =
 	"Infantry AK Ins"
 }
 
+westMortarTeam =
+{
+	"2B11 mortar",
+	"Soldier M4",
+	"Soldier M4",
+	"2B11 mortar",
+	"Soldier M4",
+	"Soldier M4"
+}
+
+eastMortarTeam =
+{
+	"2B11 mortar",
+	"Infantry AK",
+	"Infantry AK ver3",
+	"2B11 mortar",
+	"Infantry AK ver2",
+	"Infantry AK"
+}
+
+insMortarTeam =
+{
+	"2B11 mortar",
+	"Soldier AK",
+	"Soldier AK",
+	"2B11 mortar",
+	"Soldier AK",
+	"Soldier AK"
+}
+
 local function getHeading(Pos3)
 		if (Pos3.x.x > 0) and (Pos3.x.z == 0) then
 			return 0
@@ -586,8 +632,7 @@ local function getHeading(Pos3)
 		end
 end
 
-local function initializeTransport(unitName,cargoSquad)
-	--trigger.action.outText('Cargo:' .. #cargoSquad, 20)
+local function initializeTransport(unitName,cargoSquad)	
 	unitId = Unit.getByName(unitName):getID()
 
 	missionTransports[unitName] = {			
@@ -596,24 +641,16 @@ local function initializeTransport(unitName,cargoSquad)
 			cargo = cargoSquad,
 			cargo_status = "mounted"
 	}
-	--trigger.action.outText('missionTransports:' .. #missionTransports, 20)
-	--trigger.action.outText('unit name:' .. unitName, 20)
-	--trigger.action.outText('unit id:' .. unitId, 20)
-	--trigger.action.outText('data cargo:' .. missionTransports[unitName].cargo_status, 20)
 end
 
 function determineRandomSquad(hostVehicle)
 	countryId = Unit.getByName(hostVehicle):getCountry()
 	vehichleType = Unit.getByName(hostVehicle):getTypeName()
 
-	--trigger.action.outText('CountryID:' .. countryId, 20)
-	--trigger.action.outText(vehichleType, 20)
-
 	if countryId == 0 or countryId == 1 or countryId == 16 or countryId == 18 or countryId == 19 or countryId == 68 or countryId == 81 or countryId == 17 then --East
 		if vehichleType == 'BTR-80' or vehichleType == 'BMP-2' or vehichleType == 'BMP-3' or vehichleType == 'BTR-82A' then
 			--randomize a number, and determine squad type corresponding to nation and number for this vehicle type, in this case, 7 men squads
-			squadTypeSeed = mist.random(7) --1 to 5 = rifle squad, 5 and 6 = rifle squad with 1 manpads, 7 = air defense squad with manpads cmd+2 manpads+4 riflemen
-			--trigger.action.outText('seed:' .. squadTypeSeed, 20)
+			squadTypeSeed = mist.random(7) --1 to 5 = rifle squad, 5 and 6 = rifle squad with 1 manpads, 7 = air defense squad with manpads cmd+2 manpads+4 riflemen			
 			if countryId == 17 then --Insurgents
 				if squadTypeSeed < 3 then
 					initializeTransport(hostVehicle,insRifleSquadBTR_BMP2)
@@ -658,9 +695,38 @@ function determineRandomSquad(hostVehicle)
 					initializeTransport(hostVehicle,russianManpadsCmdSquadBTR_BMP2_BMP3)
 				end
 			end
-		elseif vehichleType == 'GAZ-66' then
+		elseif vehichleType == 'GAZ-66' or vehichleType == 'KAMAZ Truck' then
 			--trucks may not get any dismounts, depending on randomizer
-			return 0
+			squadTypeSeed = mist.random(7)
+			if squadTypeSeed < 4 then
+				return 0
+			elseif squadTypeSeed < 7 then
+				if countryId == 17 then
+					initializeTransport(hostVehicle,insMortarTeam)
+				elseif countryId == 81 then
+					cjtfRedTroopTypeSeed = mist.random(2)
+					if cjtfRedTroopTypeSeed == 1 then
+						initializeTransport(hostVehicle,insMortarTeam)
+					else
+						initializeTransport(hostVehicle,eastMortarTeam)
+					end
+				else
+					initializeTransport(hostVehicle,eastMortarTeam)
+				end
+			else
+				if countryId == 17 then
+					initializeTransport(hostVehicle,insRifleSquadMTLB)
+				elseif countryId == 81 then
+					cjtfRedTroopTypeSeed = mist.random(2)
+					if cjtfRedTroopTypeSeed == 1 then
+						initializeTransport(hostVehicle,insRifleSquadMTLB)
+					else
+						initializeTransport(hostVehicle,russianSquadMTLB)
+					end
+				else
+					initializeTransport(hostVehicle,russianSquadMTLB)
+				end
+			end			
 		elseif vehichleType == 'BMP-1' then
 			squadTypeSeed = mist.random(7)
 			--trigger.action.outText('seed:' .. squadTypeSeed, 20)
@@ -783,8 +849,7 @@ function determineRandomSquad(hostVehicle)
 	else --West
 		if vehichleType == 'M-2 Bradley' or vehichleType == 'Marder' or vehichleType == 'MCV-80' then
 			--randomize a number, and determine squad type corresponding to nation and number for this vehicle type, in this case, 7 men squads
-			squadTypeSeed = mist.random(7) --1 to 4 = rifle squad, 5 and 6 = rifle squad with 1 manpads, 7 = air defense squad with manpads cmd+2 manpads+4 riflemen
-			--trigger.action.outText('seed:' .. squadTypeSeed, 20)
+			squadTypeSeed = mist.random(7) --1 to 4 = rifle squad, 5 and 6 = rifle squad with 1 manpads, 7 = air defense squad with manpads cmd+2 manpads+4 riflemen			
 			if squadTypeSeed < 5 then
 				initializeTransport(hostVehicle,usaSquadBradleyMarderWarrior)
 			elseif squadTypeSeed < 7 then
@@ -792,18 +857,24 @@ function determineRandomSquad(hostVehicle)
 			else
 				initializeTransport(hostVehicle,usaSquadManpadsBradleyMarder)
 			end
-		elseif vehichleType == 'GAZ-66' then
+		elseif vehichleType == 'M 818' then
 			--trucks may not get any dismounts, depending on randomizer
-			return 0
-		elseif vehichleType == 'LAV-25' then
 			squadTypeSeed = mist.random(7)
-			--trigger.action.outText('seed:' .. squadTypeSeed, 20)
-			if squadTypeSeed < 5 then
-				initializeTransport(hostVehicle,usaSquadLAV25)
+			if squadTypeSeed < 4 then
+				return 0
 			elseif squadTypeSeed < 7 then
+				initializeTransport(hostVehicle,westMortarTeam)
+			else
+				initializeTransport(hostVehicle,usaSquadM113)
+			end
+		elseif vehichleType == 'LAV-25' then
+			squadTypeSeed = mist.random(7)			
+			if squadTypeSeed < 4 then
+				initializeTransport(hostVehicle,usaSquadLAV25)
+			elseif squadTypeSeed < 6 then
 				initializeTransport(hostVehicle,usaSquadManpadsLAV25)
-			--else
-			--	initializeTransport(hostVehicle,russianSquadManpadsCmdBMP1)
+			else
+				initializeTransport(hostVehicle,westMortarTeam)
 			end
 		elseif vehichleType == 'M-113' then
 			squadTypeSeed = mist.random(5)
@@ -827,6 +898,13 @@ function determineRandomSquad(hostVehicle)
 				initializeTransport(hostVehicle,usaSquadAAV7USMC)				
 			else
 				initializeTransport(hostVehicle,usaSquadManpadsAAV7USMC)
+			end
+		elseif vehichleType == 'TPZ' then
+			squadTypeSeed = mist.random(5)
+			if squadTypeSeed < 4 then
+				initializeTransport(hostVehicle,gerSquadTPz)				
+			else
+				initializeTransport(hostVehicle,gerSquadManpadsTPz)
 			end
 		end --END vehichle type if for west
 	end --END country type
@@ -880,7 +958,8 @@ function mechanizeAll()
 			local unitType = unit:getTypeName()
 			if unitType == 'BTR-80' or unitType == 'BMP-2' or unitType == 'BMP-3' or unitType == 'BMP-1' or unitType == 'BTR-82A' or
 			unitType == 'BMD-1' or unitType == 'BTR_D' or unitType == 'MTLB' or unitType == 'M-2 Bradley' or unitType == 'Marder' or 
-			unitType == 'MCV-80' or unitType == 'LAV-25' or unitType == 'M-113' or unitType == 'M1126 Stryker ICV' or unitType == 'AAV7' then
+			unitType == 'MCV-80' or unitType == 'LAV-25' or unitType == 'M-113' or unitType == 'M1126 Stryker ICV' or unitType == 'AAV7'
+			or unitType == 'M 818' or unitType == 'KAMAZ Truck' or unitType == 'GAZ-66' or unitType == 'TPZ' then
 				determineRandomSquad(units[i])
 			end
 		end
@@ -889,15 +968,12 @@ end
 
 
 local function spawnSquad(hostVehicle)
-	transportVehicle = missionTransports[hostVehicle]
-	--trigger.action.outText('Spawning squad', 20)
+	transportVehicle = missionTransports[hostVehicle]	
 
 	if transportVehicle ~= nil then
 		local dismountingTransport = Unit.getByName(hostVehicle)
 		local carrierPos = dismountingTransport:getPosition()
-		local carrierUnitID = transportVehicle.UnitID
-
-		--trigger.action.outText('Vehicle found', 20)
+		local carrierUnitID = transportVehicle.UnitID		
 
 		local dmVec2 = {
 			x = carrierPos.p.x + carrierPos.x.x * -5,
@@ -1005,35 +1081,23 @@ local function despawnSquad(hostVehicle)
 	local g = Group.getByName("Dismounts_" .. hostVehicle)
 	local initialSize = g:getInitialSize()
 	local currentSize = g:getUnits()
-	if initialSize > #currentSize then
-		--trigger.action.outText(hostVehicle .. ' dismounts were ' .. initialSize .. ' remaining ' .. #currentSize, 10)
+	if initialSize > #currentSize then		
 		local remainingInfantry = {}
-		for i=1,#currentSize do
-			--trigger.action.outText(currentSize[i]:getTypeName(),10)
+		for i=1,#currentSize do			
 			table.insert(remainingInfantry, currentSize[i]:getTypeName())
-		end
-		--trigger.action.outText(#remainingInfantry,10)
+		end		
 		missionTransports[hostVehicle].cargo = remainingInfantry
 	end
 end
 
-local function checkMovement()
-	--trigger.action.outText('checking movement', 2)
-	--trigger.action.outText(#missionTransports, 2)
+local function checkMovement()	
 	for unitName, transportData in pairs(missionTransports) do
-		local dismountingTransport = Unit.getByName(unitName)
-		--trigger.action.outText('unit:' .. unitName, 2)
-		--trigger.action.outText('cargo:' .. #transportData.cargo , 2)
-		--trigger.action.outText('status:' .. transportData.cargo_status, 2)
+		local dismountingTransport = Unit.getByName(unitName)		
 		if dismountingTransport ~= nil then
-				unitId = Unit.getByName(unitName):getID()
-				--trigger.action.outText('unit:' .. unitName .. ' is deploying troops if stopped', 2)
+				unitId = Unit.getByName(unitName):getID()				
 
 				local v = dismountingTransport:getVelocity()	--Velocity is a Vec3
 				local spd = mist.vec.mag(v)
-
-				--trigger.action.outText('its speed is ' .. spd .. ' (' .. v.x .. ' ' .. v.y .. ' ' .. v.z .. ')', 2)
-				
 
 				if spd < 1 then	--Check if speed is zero
 					if transportData.cargo_status == "mounted" then
