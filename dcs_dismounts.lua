@@ -230,7 +230,7 @@ usaSquadStryker =
 	"Soldier M249",
 	"Soldier M4",
 	"Soldier M4",
-	"Soldier M249"
+	"Soldier M4"
 }
 
 usaSquadManpadsStryker =
@@ -584,32 +584,32 @@ insSquadBMD1 =
 
 westMortarTeam =
 {
-	"2B11 mortar",
 	"Soldier M4",
 	"Soldier M4",
 	"2B11 mortar",
 	"Soldier M4",
-	"Soldier M4"
+	"Soldier M4",
+	"2B11 mortar"
 }
 
 eastMortarTeam =
 {
+	"Infantry AK ver3",
+	"Infantry AK",
 	"2B11 mortar",
 	"Infantry AK",
-	"Infantry AK ver3",
-	"2B11 mortar",
 	"Infantry AK ver2",
-	"Infantry AK"
+	"2B11 mortar"
 }
 
 insMortarTeam =
 {
-	"2B11 mortar",
 	"Soldier AK",
 	"Soldier AK",
 	"2B11 mortar",
 	"Soldier AK",
-	"Soldier AK"
+	"Soldier AK",
+	"2B11 mortar"
 }
 
 local function getHeading(Pos3)
