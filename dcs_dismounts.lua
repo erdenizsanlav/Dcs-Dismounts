@@ -648,7 +648,7 @@ function determineRandomSquad(hostVehicle)
 	vehichleType = Unit.getByName(hostVehicle):getTypeName()
 
 	if countryId == 0 or countryId == 1 or countryId == 16 or countryId == 18 or countryId == 19 or countryId == 68 or countryId == 81 or countryId == 17 then --East
-		if vehichleType == 'BTR-80' or vehichleType == 'BMP-2' or vehichleType == 'BMP-3' or vehichleType == 'BTR-82A' then
+		if vehichleType == 'BTR-80' or vehichleType == 'BMP-2' then
 			--randomize a number, and determine squad type corresponding to nation and number for this vehicle type, in this case, 7 men squads
 			squadTypeSeed = mist.random(7) --1 to 5 = rifle squad, 5 and 6 = rifle squad with 1 manpads, 7 = air defense squad with manpads cmd+2 manpads+4 riflemen			
 			if countryId == 17 then --Insurgents
@@ -694,6 +694,15 @@ function determineRandomSquad(hostVehicle)
 				else
 					initializeTransport(hostVehicle,russianManpadsCmdSquadBTR_BMP2_BMP3)
 				end
+			end
+		elseif vehichleType == 'ZBD04A'  or vehichleType == 'BMP-3' or vehichleType == 'BTR-82A' then
+			squadTypeSeed = mist.random(7)
+			if squadTypeSeed < 5 then
+				initializeTransport(hostVehicle,russianRifleSquadBTR_BMP2_BMP3)
+			elseif squadTypeSeed < 7 then
+				initializeTransport(hostVehicle,russianModernSquadBTR_BMP2_BMP3)
+			else
+				initializeTransport(hostVehicle,russianManpadsCmdSquadBTR_BMP2_BMP3)
 			end
 		elseif vehichleType == 'GAZ-66' or vehichleType == 'KAMAZ Truck' then
 			--trucks may not get any dismounts, depending on randomizer
@@ -959,7 +968,7 @@ function mechanizeAll()
 			if unitType == 'BTR-80' or unitType == 'BMP-2' or unitType == 'BMP-3' or unitType == 'BMP-1' or unitType == 'BTR-82A' or
 			unitType == 'BMD-1' or unitType == 'BTR_D' or unitType == 'MTLB' or unitType == 'M-2 Bradley' or unitType == 'Marder' or 
 			unitType == 'MCV-80' or unitType == 'LAV-25' or unitType == 'M-113' or unitType == 'M1126 Stryker ICV' or unitType == 'AAV7'
-			or unitType == 'M 818' or unitType == 'KAMAZ Truck' or unitType == 'GAZ-66' or unitType == 'TPZ' then
+			or unitType == 'M 818' or unitType == 'KAMAZ Truck' or unitType == 'GAZ-66' or unitType == 'TPZ' or unitType == 'ZBD04A' then
 				determineRandomSquad(units[i])
 			end
 		end
