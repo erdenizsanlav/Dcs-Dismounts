@@ -1103,12 +1103,12 @@ local function checkMovement()
 	for unitName, transportData in pairs(missionTransports) do
 		local dismountingTransport = Unit.getByName(unitName)		
 		if dismountingTransport ~= nil then
-				unitId = Unit.getByName(unitName):getID()				
+				unitId = Unit.getByName(unitName):getID()
 
 				local v = dismountingTransport:getVelocity()	--Velocity is a Vec3
 				local spd = mist.vec.mag(v)
 
-				if spd < 1 then	--Check if speed is zero
+				if spd < 1 and dismountingTransport:isActive()==true then	--Check if speed is zero
 					if transportData.cargo_status == "mounted" then
 						spawnSquad(unitName)
 						missionTransports[unitName].cargo_status = "dismounted"
@@ -1128,7 +1128,7 @@ local function checkMovement()
 					end
 				end
 		else
-			trigger.action.outText('wow sth wrong for vehichle:' .. unitName, 2)
+			--trigger.action.outText('wow sth wrong for vehichle:' .. unitName, 2)
 			--TODO: remove this entry from missionTransports table
 		end
 	end
