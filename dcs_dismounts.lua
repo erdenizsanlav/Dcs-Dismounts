@@ -612,6 +612,30 @@ insMortarTeam =
 	"2B11 mortar"
 }
 
+local function checkForMarkers(hostVehicle)
+	--local markersForUnit = mist.marker.get(hostVehicle)
+	local markersForUnit = {}
+	--trigger.action.outText('markers check for vehichle: ' .. hostVehicle, 2)
+
+	local allMarkers = world.getMarkPanels()
+	--trigger.action.outText('total markers: ' .. #markersForUnit, 2)
+
+	if allMarkers ~= nil and #allMarkers > 0 then
+		for i=1,#allMarkers do
+			if allMarkers[i].text == hostVehicle then
+				table.insert(markersForUnit,allMarkers[i])
+			end
+		end
+	end
+
+	if markersForUnit ~= nil and #markersForUnit > 0 then
+		return markersForUnit
+	else
+		return 0
+	end
+end
+
+
 local function getHeading(Pos3)
 		if (Pos3.x.x > 0) and (Pos3.x.z == 0) then
 			return 0
@@ -631,6 +655,75 @@ local function getHeading(Pos3)
 			return math.rad(270) - math.atan(Pos3.x.x / Pos3.x.z)
 		end
 end
+
+local function addWaypointToGroup(groupName,waypointsPos3)
+	local squadPath = {}
+
+	for i=1,#waypointsPos3 do
+		local wpToAdd = mist.ground.buildWP(waypointsPos3[i].pos)
+		--local dmVec2 = {
+		--	x = carrierPos.p.x + carrierPos.x.x * -5,
+		--	y = carrierPos.p.z + carrierPos.x.z * -5,
+		--}
+
+
+		--local wpToAdd = {
+		--	["action"] = 'Off Road',
+		--	["x"] = waypointsPos3[i].pos.x,
+		--	["y"] = waypointsPos3[i].pos.y,
+		--	["speed"] = 5.5555555555556,
+		--	["task"] = 
+		--						{
+		--							["id"] = "ComboTask",
+		--							["params"] = 
+		--							{
+		--								["tasks"] = 
+		--								{
+		--								}, -- end of ["tasks"]
+		--							}, -- end of ["params"]
+		--						}, -- end of ["task"]
+		--	["speed_locked"] = true,
+		--	["ETA_locked"] = true
+		--}
+
+		table.insert(squadPath,wpToAdd)
+	end
+
+	--local squadMission = {
+	--	["id"] = groupName .. '_Mission', 
+	--	["params"] = { 
+	--		["route"] = { 
+	--			["points"] = squadPath
+	--		} 
+	--	} 
+	--}
+
+	--[1] = {
+    --       action = enum AI.Task.VehicleFormation,
+    --       x = Distance, 
+    --       y = Distance, 
+    --       speed = Distance,
+    --       ETA = Time,
+    --       ETA_locked = boolean,
+    --       name = string, 
+    --       task = Task 
+    --     }
+
+	--mist.goRoute('Dismounts_' .. groupName,squadPath)
+	
+	local groupDismounts = 'Dismounts_' .. groupName
+
+	mist.goRoute(groupDismounts,squadPath)
+	--mist.ground.patrolRoute({groupName = groupDismounts, route = squadPath})
+	
+	--local grp = Group.getByName(groupDismounts)	
+	
+	--grp:getController():setTask(squadMission)
+	--grp:getController():setOnOff(false)	
+	--grp:getController():setOnOff(true)
+
+end
+
 
 local function initializeTransport(unitName,cargoSquad)	
 	unitId = Unit.getByName(unitName):getID()
@@ -1112,6 +1205,15 @@ local function checkMovement()
 					if transportData.cargo_status == "mounted" then
 						spawnSquad(unitName)
 						missionTransports[unitName].cargo_status = "dismounted"
+					elseif transportData.cargo_status == "dismounted" then
+						local markers = checkForMarkers(unitName)
+						if markers ~= 0 then
+							for i=1,#markers do
+								addWaypointToGroup(unitName,markers)
+							end
+						--else
+						--	trigger.action.outText('saddy mc sad face :( markers were 0 for vehichle:' .. unitName, 2)
+						end
 					end
 				else	--Else carrier is moving
 					if transportData.cargo_status == "dismounted" then
