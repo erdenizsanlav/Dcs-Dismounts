@@ -635,7 +635,6 @@ local function checkForMarkers(hostVehicle)
 	end
 end
 
-
 local function getHeading(Pos3)
 		if (Pos3.x.x > 0) and (Pos3.x.z == 0) then
 			return 0
@@ -657,71 +656,27 @@ local function getHeading(Pos3)
 end
 
 local function addWaypointToGroup(groupName,waypointsPos3)
+	trigger.action.outText('So we are adding WPs to group:' .. groupName, 5)
+	trigger.action.outText(mist.utils.tableShow(waypointsPos3),15)
+	
 	local squadPath = {}
-
-	for i=1,#waypointsPos3 do
-		local wpToAdd = mist.ground.buildWP(waypointsPos3[i].pos)
-		--local dmVec2 = {
-		--	x = carrierPos.p.x + carrierPos.x.x * -5,
-		--	y = carrierPos.p.z + carrierPos.x.z * -5,
-		--}
-
-
-		--local wpToAdd = {
-		--	["action"] = 'Off Road',
-		--	["x"] = waypointsPos3[i].pos.x,
-		--	["y"] = waypointsPos3[i].pos.y,
-		--	["speed"] = 5.5555555555556,
-		--	["task"] = 
-		--						{
-		--							["id"] = "ComboTask",
-		--							["params"] = 
-		--							{
-		--								["tasks"] = 
-		--								{
-		--								}, -- end of ["tasks"]
-		--							}, -- end of ["params"]
-		--						}, -- end of ["task"]
-		--	["speed_locked"] = true,
-		--	["ETA_locked"] = true
-		--}
-
-		table.insert(squadPath,wpToAdd)
-	end
-
-	--local squadMission = {
-	--	["id"] = groupName .. '_Mission', 
-	--	["params"] = { 
-	--		["route"] = { 
-	--			["points"] = squadPath
-	--		} 
-	--	} 
-	--}
-
-	--[1] = {
-    --       action = enum AI.Task.VehicleFormation,
-    --       x = Distance, 
-    --       y = Distance, 
-    --       speed = Distance,
-    --       ETA = Time,
-    --       ETA_locked = boolean,
-    --       name = string, 
-    --       task = Task 
-    --     }
-
-	--mist.goRoute('Dismounts_' .. groupName,squadPath)
-	
 	local groupDismounts = 'Dismounts_' .. groupName
+	squadPath[1] = mist.ground.buildWP(mist.getLeadPos(groupDismounts))
+	trigger.action.outText(mist.utils.tableShow(squadPath[1]),15)
 
+	--for i=1,#waypointsPos3 do
+	--	local wpToAdd = mist.ground.buildWP(waypointsPos3[i])
+	--	table.insert(squadPath,wpToAdd)
+	--end
+
+	local wpToAdd = mist.ground.buildWP(waypointsPos3[1].pos)
+
+	trigger.action.outText(mist.utils.tableShow(wpToAdd),15)
+	table.insert(squadPath,wpToAdd)
+
+	--Group.getByName(groupDismounts):getController():setOnOff(false)
 	mist.goRoute(groupDismounts,squadPath)
-	--mist.ground.patrolRoute({groupName = groupDismounts, route = squadPath})
-	
-	--local grp = Group.getByName(groupDismounts)	
-	
-	--grp:getController():setTask(squadMission)
-	--grp:getController():setOnOff(false)	
-	--grp:getController():setOnOff(true)
-
+	--Group.getByName(groupDismounts):getController():setOnOff(true)
 end
 
 
@@ -1019,22 +974,22 @@ function assignSetSquadTypeToVehicle(hostVehicle, squadType)
 
 	if vehicle ~= nil then
 		--vehicles with 7 passenger capacity
-		if vehichleType == 'BTR-80' or vehichleType == 'BMP-2' or vehichleType == 'BMP-3' or vehichleType == 'BTR-82A' or vehichleType == 'M-2 Bradley' or vehichleType == 'Marder' or vehichleType == 'MCV-80' then
-			if squadType == 'rifleWest' then
-				initializeTransport(hostVehicle,usaSquadBradleyMarderWarrior)
-			elseif squadType == 'rifleRu' then
-				initializeTransport(hostVehicle,russianRifleSquadBTR_BMP2_BMP3)
-			elseif squadType == 'rifleIns' then
-				initializeTransport(hostVehicle,insRifleSquadBTR_BMP2)
-			elseif squadType == 'manpadsWest' then
-				initializeTransport(hostVehicle,usaSquadManpadsBradleyMarder)
-			elseif squadType == 'manpadsRu' then
-				initializeTransport(hostVehicle,russianModernSquadBTR_BMP2_BMP3)
-			elseif squadType == 'manpadsIns' then
-				initializeTransport(hostVehicle,insSquadManpadsBTR_BMP2)
-			end
+		--if vehichleType == 'BTR-80' or vehichleType == 'BMP-2' or vehichleType == 'BMP-3' or vehichleType == 'BTR-82A' or vehichleType == 'M-2 Bradley' or vehichleType == 'Marder' or vehichleType == 'MCV-80' then
+		--	if squadType == 'rifleWest' then
+		--		initializeTransport(hostVehicle,usaSquadBradleyMarderWarrior)
+		--	elseif squadType == 'rifleRu' then
+		--		initializeTransport(hostVehicle,russianRifleSquadBTR_BMP2_BMP3)
+		--	elseif squadType == 'rifleIns' then
+		--		initializeTransport(hostVehicle,insRifleSquadBTR_BMP2)
+		--	elseif squadType == 'manpadsWest' then
+		--		initializeTransport(hostVehicle,usaSquadManpadsBradleyMarder)
+		--	elseif squadType == 'manpadsRu' then
+		--		initializeTransport(hostVehicle,russianModernSquadBTR_BMP2_BMP3)
+		--	elseif squadType == 'manpadsIns' then
+		--		initializeTransport(hostVehicle,insSquadManpadsBTR_BMP2)
+		--	end
 		--vehicles with 11 passenger capacity
-		elseif vehichleType == 'M-113' or vehichleType == 'MTLB' then
+		if vehichleType == 'M-113' or vehichleType == 'MTLB' then
 			if squadType == 'rifleWest' then
 				initializeTransport(hostVehicle,usaSquadM113)
 			elseif squadType == 'rifleRu' then
@@ -1047,6 +1002,20 @@ function assignSetSquadTypeToVehicle(hostVehicle, squadType)
 				initializeTransport(hostVehicle,russianSquadManpadsMTLB)
 			elseif squadType == 'manpadsIns' then
 				initializeTransport(hostVehicle,insSquadManpadsMTLB)
+			end
+		else --else use 7 man squads for now
+			if squadType == 'rifleWest' then
+				initializeTransport(hostVehicle,usaSquadBradleyMarderWarrior)
+			elseif squadType == 'rifleRu' then
+				initializeTransport(hostVehicle,russianRifleSquadBTR_BMP2_BMP3)
+			elseif squadType == 'rifleIns' then
+				initializeTransport(hostVehicle,insRifleSquadBTR_BMP2)
+			elseif squadType == 'manpadsWest' then
+				initializeTransport(hostVehicle,usaSquadManpadsBradleyMarder)
+			elseif squadType == 'manpadsRu' then
+				initializeTransport(hostVehicle,russianModernSquadBTR_BMP2_BMP3)
+			elseif squadType == 'manpadsIns' then
+				initializeTransport(hostVehicle,insSquadManpadsBTR_BMP2)
 			end
 		end
 	end
@@ -1206,14 +1175,14 @@ local function checkMovement()
 						spawnSquad(unitName)
 						missionTransports[unitName].cargo_status = "dismounted"
 					elseif transportData.cargo_status == "dismounted" then
-						local markers = checkForMarkers(unitName)
-						if markers ~= 0 then
-							for i=1,#markers do
-								addWaypointToGroup(unitName,markers)
-							end
+						--local markers = checkForMarkers(unitName)
+						--if markers ~= 0 then
+						--	for i=1,#markers do
+						--		addWaypointToGroup(unitName,markers)
+						--	end
 						--else
 						--	trigger.action.outText('saddy mc sad face :( markers were 0 for vehichle:' .. unitName, 2)
-						end
+						--end
 					end
 				else	--Else carrier is moving
 					if transportData.cargo_status == "dismounted" then
@@ -1236,6 +1205,43 @@ local function checkMovement()
 	end
 	return timer.getTime() + 5
 end
+
+local function sanitizeMarkers(markerText, markerId)
+	trigger.action.outText('Marker event hit, marker text:' .. markerText .. ' marker Id:' .. markerId, 5)
+
+	local mkrPfx = string.sub(markerText,1,5)
+	local markers = checkForMarkers(markerText)
+	local markerIdForWP = {}
+
+	if mkrPfx == 'infWP' or mkrPfx == 'infTG' then
+		if #markers > 1 then
+			for i=1,#markers do
+				if markers[i].idx ~= markerId then
+					mist.marker.remove(markers[i].idx)				
+				else
+					table.insert(markerIdForWP, markers[i])
+				end
+			end
+		else
+			table.insert(markerIdForWP, markers[1])
+		end
+		local unitName = string.sub(markerText,6,#markerText)
+		addWaypointToGroup(unitName,markerIdForWP)
+	end	
+end
+
+local e = {}
+function e:onEvent(event)
+	if event.id == world.event.S_EVENT_MARK_ADDED or event.id == world.event.S_EVENT_MARK_CHANGE then
+		local mkrText = event.text
+		local mkrPfx = string.sub(mkrText,1,5)
+		if  mkrPfx == 'infWP' or mkrPfx == 'infTG' then
+			sanitizeMarkers(mkrText, event.idx)
+		end
+	end
+end
+world.addEventHandler(e)
+
 
 timer.scheduleFunction(checkMovement, nil, timer.getTime() + 1)
 
