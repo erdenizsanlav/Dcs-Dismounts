@@ -24,6 +24,7 @@ do
 local missionTransports = {}
 dismountsInitiated = 0
 
+--START Squads
 russianModernSquadBTR_BMP2_BMP3 =
 {
 	"Infantry AK",
@@ -612,6 +613,59 @@ insMortarTeam =
 	"2B11 mortar"
 }
 
+ww2Wehrmacht =
+{
+	"soldier_mauser98",
+	"soldier_mauser98",
+	"soldier_mauser98",
+	"soldier_mauser98",
+	"soldier_mauser98",
+	"soldier_mauser98",
+	"soldier_mauser98"
+}
+
+ww2UKTroops =
+{
+	"soldier_wwii_br_01",
+	"soldier_wwii_br_01",
+	"soldier_wwii_br_01",
+	"soldier_wwii_br_01",
+	"soldier_wwii_br_01",
+	"soldier_wwii_br_01",
+	"soldier_wwii_br_01"
+}
+
+ww2USTroops =
+{
+	"soldier_wwii_us",
+	"soldier_wwii_us",
+	"soldier_wwii_us",
+	"soldier_wwii_us",
+	"soldier_wwii_us",
+	"soldier_wwii_us",
+	"soldier_wwii_us"
+}
+--END squads
+
+--Script options
+dismountsOptions = 
+{
+	['LeaveDropped'] = false,
+	['WWIIAssets'] = false,
+	['FrenchPack'] = false,
+	['TroopsFollowSlowTransport'] = false,
+}
+
+function setOptions(optionsList)
+	for key,value in pairs(dismountsOptions) do
+		if optionsList[key] ~= nil then
+			dismountsOptions[key] = optionsList[key]
+		end
+	end
+	trigger.action.outText(mist.utils.tableShow(dismountsOptions),25)
+end
+
+
 local function checkForMarkers(hostVehicle)
 	--local markersForUnit = mist.marker.get(hostVehicle)
 	local markersForUnit = {}
@@ -962,9 +1016,34 @@ function determineRandomSquad(hostVehicle)
 				initializeTransport(hostVehicle,gerSquadTPz)				
 			else
 				initializeTransport(hostVehicle,gerSquadManpadsTPz)
-			end
+			end		
 		end --END vehichle type if for west
 	end --END country type
+
+	if dismountsOptions["WWIIAssets"] == true then
+			if vehichleType == 'Blitz_36-6700A' or vehichleType == 'Sd_Kfz_251' or vehichleType == 'Sd_Kfz_7' then				
+				initializeTransport(hostVehicle,ww2Wehrmacht)
+			elseif vehichleType == 'Bedford_MWD' then
+				initializeTransport(hostVehicle,ww2UKTroops)
+			elseif vehichleType == 'CCKW_353' or vehichleType == 'M2A1_halftrack' then
+				initializeTransport(hostVehicle,ww2USTroops)
+			end
+	end
+
+	if dismountsOptions["FrenchPack"] == true then
+			if vehichleType == 'VBCI' then --VBCI 8 troops capacity
+				squadTypeSeed = mist.random(7)	
+				local pseudoFrenchySquad = {}
+				if squadTypeSeed < 5 then
+					pseudoFrenchySquad = mist.utils.deepCopy(usaSquadBradleyMarderWarrior)
+					table.insert(pseudoFrenchySquad,'Soldier M4')
+				elseif squadTypeSeed < 8 then
+					pseudoFrenchySquad = mist.utils.deepCopy(usaSquadManpadsBradleyMarder)
+					table.insert(pseudoFrenchySquad,'Soldier M4')
+				end
+				initializeTransport(hostVehicle,pseudoFrenchySquad)
+			end
+	end
 end
 
 function assignSetSquadTypeToVehicle(hostVehicle, squadType)
@@ -1021,7 +1100,11 @@ function assignSetSquadTypeToVehicle(hostVehicle, squadType)
 	end
 end
 
-function mechanizeAll()
+function mechanizeAll(optionsList)
+	if optionsList ~= nil then
+		setOptions(optionsList)
+	end
+
 	local units = mist.makeUnitTable({'[all][vehicle]'})
 	for i=1,#units do
 		local unit = Unit.getByName(units[i])
@@ -1030,8 +1113,24 @@ function mechanizeAll()
 			if unitType == 'BTR-80' or unitType == 'BMP-2' or unitType == 'BMP-3' or unitType == 'BMP-1' or unitType == 'BTR-82A' or
 			unitType == 'BMD-1' or unitType == 'BTR_D' or unitType == 'MTLB' or unitType == 'M-2 Bradley' or unitType == 'Marder' or 
 			unitType == 'MCV-80' or unitType == 'LAV-25' or unitType == 'M-113' or unitType == 'M1126 Stryker ICV' or unitType == 'AAV7'
-			or unitType == 'M 818' or unitType == 'KAMAZ Truck' or unitType == 'GAZ-66' or unitType == 'TPZ' or unitType == 'ZBD04A' then
+			or unitType == 'M 818' or unitType == 'KAMAZ Truck' or unitType == 'GAZ-66' or unitType == 'TPZ' or unitType == 'ZBD04A' then		
 				determineRandomSquad(units[i])
+			end
+			
+			if dismountsOptions["WWIIAssets"] == true then				
+				if unitType == 'Blitz_36-6700A' or unitType == 'Sd_Kfz_251' or unitType == 'Sd_Kfz_7'
+					or unitType == 'Bedford_MWD' or unitType == 'CCKW_353' or unitType == 'M2A1_halftrack'
+				then					
+					determineRandomSquad(units[i])
+				end
+			end
+
+			if dismountsOptions["FrenchPack"] == true then				
+				if unitType == 'VBCI' --or unitType == 'Sd_Kfz_251' or unitType == 'Sd_Kfz_7'
+					--or unitType == 'Bedford_MWD' or unitType == 'CCKW_353' or unitType == 'M2A1_halftrack'
+				then					
+					determineRandomSquad(units[i])
+				end
 			end
 		end
 	end
