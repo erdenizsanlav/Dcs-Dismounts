@@ -710,13 +710,13 @@ local function getHeading(Pos3)
 end
 
 local function addWaypointToGroup(groupName,waypointsPos3)
-	trigger.action.outText('So we are adding WPs to group:' .. groupName, 5)
-	trigger.action.outText(mist.utils.tableShow(waypointsPos3),15)
+	--trigger.action.outText('So we are adding WPs to group:' .. groupName, 5)
+	--trigger.action.outText(mist.utils.tableShow(waypointsPos3),15)
 	
 	local squadPath = {}
 	local groupDismounts = 'Dismounts_' .. groupName
 	squadPath[1] = mist.ground.buildWP(mist.getLeadPos(groupDismounts))
-	trigger.action.outText(mist.utils.tableShow(squadPath[1]),15)
+	--trigger.action.outText(mist.utils.tableShow(squadPath[1]),15)
 
 	--for i=1,#waypointsPos3 do
 	--	local wpToAdd = mist.ground.buildWP(waypointsPos3[i])
@@ -725,13 +725,38 @@ local function addWaypointToGroup(groupName,waypointsPos3)
 
 	local wpToAdd = mist.ground.buildWP(waypointsPos3[1].pos)
 
-	trigger.action.outText(mist.utils.tableShow(wpToAdd),15)
+	--trigger.action.outText(mist.utils.tableShow(wpToAdd),15)
 	table.insert(squadPath,wpToAdd)
 
 	--Group.getByName(groupDismounts):getController():setOnOff(false)
 	mist.goRoute(groupDismounts,squadPath)
 	--Group.getByName(groupDismounts):getController():setOnOff(true)
 end
+
+local function createTargetPoint(groupName,waypointsPos3,radiusOfAttack)
+	local radiusOfBoom = 5
+	if radiusOfAttack ~= nil then
+		radiusOfBoom = radiusOfAttack
+	end	
+	local groupDismounts = 'Dismounts_' .. groupName
+
+	local tgt = { 
+		id = 'FireAtPoint', 
+		params = { 
+			x = waypointsPos3[1].pos.x,
+			y = waypointsPos3[1].pos.z,
+			radius = radiusOfBoom,
+			expendQty = 20,
+			expendQtyEnabled = false,
+			weaponType = 3221225470,
+			altitude = 0,
+			alt_type = 1,
+		} 
+	}
+
+	Group.getByName(groupDismounts):getController():setTask(tgt)
+end
+
 
 
 local function initializeTransport(unitName,cargoSquad)	
@@ -1325,7 +1350,11 @@ local function sanitizeMarkers(markerText, markerId)
 			table.insert(markerIdForWP, markers[1])
 		end
 		local unitName = string.sub(markerText,6,#markerText)
-		addWaypointToGroup(unitName,markerIdForWP)
+		if mkrPfx == 'infWP' then
+			addWaypointToGroup(unitName,markerIdForWP)
+		else
+			createTargetPoint(unitName,markerIdForWP)
+		end
 	end	
 end
 
