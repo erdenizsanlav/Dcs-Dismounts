@@ -22,6 +22,8 @@
 do
 
 local missionTransports = {}
+local groupsWithRoutes = {}
+local groupsWithRoutesUpdated = {}
 dismountsInitiated = 0
 
 --START Squads
@@ -650,10 +652,11 @@ ww2USTroops =
 --Script options
 dismountsOptions = 
 {
-	['LeaveDropped'] = false,
+	['LeaveDeployed'] = false,
 	['WWIIAssets'] = false,
 	['FrenchPack'] = false,
 	['TroopsFollowSlowTransport'] = false,
+	['GorgeousGeorgians'] = false,
 }
 
 function setOptions(optionsList)
@@ -664,6 +667,18 @@ function setOptions(optionsList)
 	end
 	trigger.action.outText(mist.utils.tableShow(dismountsOptions),25)
 end
+
+function georgify(origSquad)
+	local newSquad = mist.utils.deepCopy(origSquad)
+
+	for i=1,#newSquad do
+		if newSquad[i] == 'Soldier M4' then
+			newSquad[i] = 'Soldier M4 GRG'
+		end
+	end
+	return newSquad
+end
+
 
 
 local function checkForMarkers(hostVehicle)
@@ -725,8 +740,19 @@ local function addWaypointToGroup(groupName,waypointsPos3)
 
 	local wpToAdd = mist.ground.buildWP(waypointsPos3[1].pos)
 
-	--trigger.action.outText(mist.utils.tableShow(wpToAdd),15)
+	
+	
 	table.insert(squadPath,wpToAdd)
+
+	--if groupName == 'Ground-1-7' then
+	--	trigger.action.outText('ZONE WPT ATTEMPT!!!',35)
+	--	trigger.action.outText(mist.utils.tableShow(wpToAdd),35)
+	--	trigger.action.outText(mist.utils.tableShow(squadPath),35)
+	--else
+	--	trigger.action.outText('This is the WP format from marks that work',35)
+	--	trigger.action.outText(mist.utils.tableShow(wpToAdd),35)
+	--	trigger.action.outText(mist.utils.tableShow(squadPath),35)
+	--end
 
 	--Group.getByName(groupDismounts):getController():setOnOff(false)
 	mist.goRoute(groupDismounts,squadPath)
@@ -761,6 +787,10 @@ end
 
 local function initializeTransport(unitName,cargoSquad)	
 	unitId = Unit.getByName(unitName):getID()
+
+	if dismountsOptions["GorgeousGeorgians"] == true then
+		cargoSquad = georgify(cargoSquad)
+	end
 
 	missionTransports[unitName] = {			
 			countryID = Unit.getByName(unitName):getCountry(),
@@ -1175,6 +1205,42 @@ local function spawnSquad(hostVehicle)
 			y = carrierPos.p.z + carrierPos.x.z * -5,
 		}
 		local heading = getHeading(carrierPos)
+		local dismountsWP2X = dmVec2.x + 55
+		local dismountsWP2Y = dmVec2.y + 45
+
+		local markDismountWP = checkForMarkers('infWP'..hostVehicle)
+		local zoneDismountWP = trigger.misc.getZone('WP_'..hostVehicle)
+
+		--if hostVehicle == 'Ground-1-7' then
+		--	trigger.action.outText('So this is our vehicle with zone...',15)
+		--
+		--	if zoneDismountWP ~= nil then
+		--		trigger.action.outText(mist.utils.tableShow(zoneDismountWP),15)
+		--	else
+		--		trigger.action.outText('AND YET ITS ZONE AINT FOUND... GGGRRRRRRRRRRRRRR',15)
+		--	end
+		--end
+
+
+		if markDismountWP ~= 0 and #markDismountWP > 0 then
+			--local dismountsWP2X = markDismountWP[1].pos.x
+			--local dismountsWP2Y = markDismountWP[1].pos.z
+
+			local routeToSchedule = { pos = markDismountWP[1].pos }
+			
+			groupsWithRoutes[hostVehicle] = routeToSchedule
+		elseif zoneDismountWP ~= nil then
+			--trigger.action.outText(mist.utils.tableShow(zoneDismountWP),15)
+			--local dismountsWP2X = zoneDismountWP.point.x
+			--local dismountsWP2Y = zoneDismountWP.point.z
+
+			local routeToSchedule = { pos = zoneDismountWP.point }
+
+			groupsWithRoutes[hostVehicle] = routeToSchedule
+
+			--trigger.action.outText(mist.utils.tableShow(groupsWithRoutes),15)
+		end
+
 		if transportVehicle.cargo ~= nil then
 			local groupData = {
 					["visible"] = false,
@@ -1192,8 +1258,8 @@ local function spawnSquad(hostVehicle)
 								["ETA"] = 0,
 								["alt_type"] = "BARO",
 								["formation_template"] = "",
-								["y"] = dmVec2.y,
-								["x"] = dmVec2.x,
+								["y"] = dismountsWP2Y,--dmVec2.y,
+								["x"] = dismountsWP2X,--dmVec2.x,
 								["ETA_locked"] = true,
 								["speed"] = 5.5555555555556,
 								["action"] = "Off Road",
@@ -1216,8 +1282,8 @@ local function spawnSquad(hostVehicle)
 								["ETA"] = 0,
 								["alt_type"] = "BARO",
 								["formation_template"] = "",
-								["y"] = dmVec2.y + 45,
-								["x"] = dmVec2.x + 55,
+								["y"] = dismountsWP2Y,
+								["x"] = dismountsWP2X,
 								["ETA_locked"] = false,
 								["speed"] = 5.5555555555556,
 								["action"] = "Off Road",
@@ -1327,6 +1393,42 @@ local function checkMovement()
 			--TODO: remove this entry from missionTransports table
 		end
 	end
+
+	--trigger.action.outText('grouops with routes are numbered as: '..#groupsWithRoutes,15)
+	for key, value in pairs(groupsWithRoutes) do
+		local dismountedGroupName = 'Dismounts_' .. key
+		local dismountedGroup = Group.getByName(dismountedGroupName)
+			
+		if dismountedGroup ~= nil then
+			--trigger.action.outText('so this should really work.. '..key,35)
+			local newPath = {}
+			newPath[1] = value
+			--trigger.action.outText('WPT is: '..mist.utils.tableShow(newPath),35)
+			addWaypointToGroup(key,newPath)
+			if groupsWithRoutesUpdated[key] ~= nil then
+				groupsWithRoutesUpdated[key] = groupsWithRoutesUpdated[key] + 1
+			else
+				groupsWithRoutesUpdated[key] = 1
+			end
+		end
+	end
+
+	local removeRoutesUpdated = {}
+	for key, value in pairs(groupsWithRoutesUpdated) do
+		local cont = true
+		if groupsWithRoutes[key] == nil then
+			table.insert(removeRoutesUpdated,key)
+			cont = false
+		end		
+		if cont and value > 1 then
+			groupsWithRoutes[key] = nil
+		end		
+	end
+
+	for i=1,#removeRoutesUpdated do
+		groupsWithRoutesUpdated[removeRoutesUpdated[i]] = nil
+	end
+
 	return timer.getTime() + 5
 end
 
@@ -1337,19 +1439,47 @@ local function sanitizeMarkers(markerText, markerId)
 	local markers = checkForMarkers(markerText)
 	local markerIdForWP = {}
 
+	
+
 	if mkrPfx == 'infWP' or mkrPfx == 'infTG' then
+		--First find the marker with provided ID, which sadly takes an additional loop
+		local currentMarker = {}
+		for i=1,#markers do
+			if markers[i].idx == markerId then
+				currentMarker = markers[i]
+				--trigger.action.outText("Marker's side was: " .. markers[i].coalition ,15)
+				--trigger.action.outText("Marker's initiator was: " .. markers[i].author ,15)
+			end
+		end
+		local unitName = string.sub(markerText,6,#markerText)
+		--Check if the marker is created by a player from same side as the unit
+		local unitCoalition = Unit.getByName(unitName):getCoalition()
+		if currentMarker.coalition ~= unitCoalition then
+			trigger.action.outText('scheisse! wrongg faction, wir haben eine SPYYY', 15)
+			trigger.action.outText('faction unit: ' .. unitCoalition, 15)
+			--trigger.action.outText('faction marker: ' .. currentMarker.coalition, 15)
+			trigger.action.outText(mist.utils.tableShow(currentMarker),15)
+			mist.marker.remove(markerId)
+			return 0
+		end
+
+
 		if #markers > 1 then
 			for i=1,#markers do
 				if markers[i].idx ~= markerId then
 					mist.marker.remove(markers[i].idx)				
 				else
 					table.insert(markerIdForWP, markers[i])
+					trigger.action.outText("Marker's side was: " .. markers[i].coalition ,15)
+					trigger.action.outText("Marker's initiator was: " .. markers[i].author ,15)
 				end
 			end
 		else
 			table.insert(markerIdForWP, markers[1])
+			trigger.action.outText("Marker's side was: " .. markers[1].coalition ,15)
+			trigger.action.outText("Marker's initiator was: " .. markers[1].author ,15)
 		end
-		local unitName = string.sub(markerText,6,#markerText)
+		
 		if mkrPfx == 'infWP' then
 			addWaypointToGroup(unitName,markerIdForWP)
 		else
