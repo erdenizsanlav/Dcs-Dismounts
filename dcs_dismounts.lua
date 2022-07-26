@@ -649,6 +649,19 @@ ww2USTroops =
 }
 --END squads
 
+--MOD squads
+westMortarTeamFrenchPack =
+{
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"Soldier M4",
+	"M120",
+	"M120"
+}
+--END MOD squads
+
+
 --Script options
 dismountsOptions = 
 {
@@ -1097,6 +1110,22 @@ function determineRandomSquad(hostVehicle)
 					table.insert(pseudoFrenchySquad,'Soldier M4')
 				end
 				initializeTransport(hostVehicle,pseudoFrenchySquad)
+			elseif vehichleType == 'VAB_50' or vehichleType == 'VIB_VBR' or vehichleType == 'VAB_RADIO' then --VAB 10 troops capacity
+				squadTypeSeed = mist.random(5)
+				if squadTypeSeed < 4 then
+					initializeTransport(hostVehicle,gerSquadTPz)				
+				else
+					initializeTransport(hostVehicle,gerSquadManpadsTPz)
+				end
+			elseif vehichleType == 'TRM2000' then
+				squadTypeSeed = mist.random(7)
+				if squadTypeSeed < 4 then
+					return 0
+				elseif squadTypeSeed < 7 then
+					initializeTransport(hostVehicle,westMortarTeamFrenchPack)
+				else
+					initializeTransport(hostVehicle,usaSquadM113)
+				end
 			end
 	end
 end
@@ -1181,8 +1210,10 @@ function mechanizeAll(optionsList)
 			end
 
 			if dismountsOptions["FrenchPack"] == true then				
-				if unitType == 'VBCI' --or unitType == 'Sd_Kfz_251' or unitType == 'Sd_Kfz_7'
-					--or unitType == 'Bedford_MWD' or unitType == 'CCKW_353' or unitType == 'M2A1_halftrack'
+				if unitType == 'VBCI' or unitType == 'VAB_50' or unitType == 'VIB_VBR'
+					or unitType == 'VBAE' or unitType == 'VBAE_MMP' or unitType == 'VBL50'
+					or unitType == 'VBLANF1' or unitType == 'TRM2000' or unitType == 'VAB_RADIO'
+					or unitType == 'VBL-Radio'
 				then					
 					determineRandomSquad(units[i])
 				end
