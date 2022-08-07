@@ -22,9 +22,36 @@
 do
 
 local missionTransports = {}
+local weaponTransports = {}
 local groupsWithRoutes = {}
 local groupsWithRoutesUpdated = {}
 dismountsInitiated = 0
+
+transportCapacities = 
+{
+	["BMP-1"] = 8,
+	["BMP-2"] = 7,
+	["BMP-3"] = 7,
+	["BTR-82A"] = 7,
+	["BTR-80"] = 7,
+	["BMD-1"] = 6,
+	["BTR_D"] = 6,
+	["GAZ-66"] = 7,
+	["KAMAZ Truck"] = 7,
+	["ZBD04A"] = 7,
+	["M-2 Bradley"] = 7,
+	["Marder"] = 7,
+	["MCV-80"] = 7,
+	["LAV-25"] = 6,
+	["M 818"] = 7,
+	["M-113"] = 11,
+	["M1126 Stryker ICV"] = 9,
+	["AAV7"] = 21,
+	["TPZ"] = 10,
+	["MTLB"] = 11,
+	["M 818"] = 7,
+}
+
 
 --START Squads
 russianModernSquadBTR_BMP2_BMP3 =
@@ -661,6 +688,76 @@ westMortarTeamFrenchPack =
 }
 --END MOD squads
 
+--Transports for weapon positions
+ukRapierSiteTransport =
+{
+	"",
+}
+
+--END Transports for weapon positions
+
+--Weapon sites
+ukRapierSite =
+{
+	["RDR"] = 
+	{
+		["vehicleName"] = "",
+		"",
+		"",
+		"",
+	},
+	["OPT"] =
+	{
+		["vehicleName"] = "",
+		"",
+		"",
+		"",
+	},
+	["MSL"] =
+	{
+		["vehicleName"] = "",
+		"",
+		"",
+		"",
+	},
+	["STF"] =
+	{
+		["vehicleName"] = "",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+	},
+}
+
+ruAAASite =
+{
+	["RDR"] =
+	{
+		["vehicleNames"] = {'TRUCKRU'}
+	},
+	["KS19s"] =
+	{
+		["vehicleNames"] = {'TRUCKRU'}
+	},
+	["S60s"] =
+	{
+		["vehicleNames"] = {'TRUCKRU'}
+	},
+	["ZU23s"] =
+	{
+		["vehicleNames"] = {'TRUCKRU'}
+	},
+	["STF"] =
+	{
+		["vehicleNames"] = {'UTILRU'}
+	},
+}
+
+--END Weapon sites
+
 
 --Script options
 dismountsOptions = 
@@ -670,12 +767,13 @@ dismountsOptions =
 	['FrenchPack'] = false,
 	['TroopsFollowSlowTransport'] = false,
 	['GorgeousGeorgians'] = false,
+	['VehiclesToIgnore'] = {}
 }
 
 function setOptions(optionsList)
 	for key,value in pairs(dismountsOptions) do
 		if optionsList[key] ~= nil then
-			dismountsOptions[key] = optionsList[key]
+			dismountsOptions[key] = optionsList[key]		
 		end
 	end
 	trigger.action.outText(mist.utils.tableShow(dismountsOptions),25)
@@ -691,8 +789,6 @@ function georgify(origSquad)
 	end
 	return newSquad
 end
-
-
 
 local function checkForMarkers(hostVehicle)
 	--local markersForUnit = mist.marker.get(hostVehicle)
@@ -796,6 +892,55 @@ local function createTargetPoint(groupName,waypointsPos3,radiusOfAttack)
 	Group.getByName(groupDismounts):getController():setTask(tgt)
 end
 
+--This is for when there is no country specific squad type definition for given vehicle is available, in that case, we will create a random squad based on countryID being east/insurgent/west, as well as the squad having a manpad or being rifle only
+local function randomizedSquadForTransport(transportType, squadType, countryID)
+	local troopNumber = 7 --default to 7
+	if transportCapacities[transportType] ~= nil then --if it is a vehicle we know the troop capacity of, then use that instead
+		troopNumber = transportCapacities[transportType]
+	end
+	if squadType == nil then
+		local squadTypeSeed = mist.random(3)
+		if squadTypeSeed < 3 then
+			squadType = 'rifle'
+		else
+			squadType = 'manpads'
+		end
+	end
+	local squadComposition = {}
+	local manpadsSoldierType = ''
+	local rifleSoldierType = ''
+
+	if countryID == 0 or countryID == 1 or countryID == 16 or countryID == 18 or countryID == 19 or countryID == 68 or countryID == 81 then --east/Ru
+		manpadsSoldierType = 'SA-18 Igla-S manpad'
+		local riflemanTypeSeed = mist.random(3)
+		if riflemanTypeSeed == 1 then
+			rifleSoldierType = 'Infantry AK'
+		elseif riflemanTypeSeed == 2 then
+			rifleSoldierType = 'Infantry AK ver2'
+		else
+			rifleSoldierType = 'Infantry AK ver3'
+		end
+	elseif  countryID == 17 then --Insurgent
+		local insManpadsTypeSeed = mist.random(2)
+		if insManpadsTypeSeed == 1 then
+			manpadsSoldierType = 'Igla manpad INS'
+		else
+			manpadsSoldierType = 'SA-18 Igla manpad'
+		end		
+		rifleSoldierType = 'Infantry AK Ins'
+	else --west
+		manpadsSoldierType = 'Soldier stinger'
+		rifleSoldierType = 'Soldier M4'
+	end
+	if squadType == 'manpads' then
+		table.insert(squadComposition,manpadsSoldierType)
+		troopNumber = troopNumber - 1
+	end
+	for i=1,troopNumber do
+		table.insert(squadComposition,rifleSoldierType)
+	end
+	return squadComposition
+end
 
 
 local function initializeTransport(unitName,cargoSquad)	
@@ -812,6 +957,38 @@ local function initializeTransport(unitName,cargoSquad)
 			cargo_status = "mounted"
 	}
 end
+
+function assignWeaponTransports(hostGroup,cargoType)
+	local transportGroup = Group.getByName(hostGroup)
+	local unitsInGroup = transportGroup:getUnits()
+	local unitsWithCargo = {}
+	local weaponTransportType = {}
+
+	if cargoType == 'ruAAASite' then
+		weaponTransportType = mist.utils.deepCopy(ruAAASite)
+	elseif cargoType == 'ukRapierSite' then
+		weaponTransportType = mist.utils.deepCopy(ukRapierSite)
+	end
+
+	for z=1,#unitsInGroup do
+		local unitToProcess = Unit.getByName(unitsInGroup[z])
+		local unitType = unitToProcess:getTypeName()
+	end
+
+	for key,value in pairs(weaponTransportType) do
+		if key == "RDR" then
+			if value[1] == 'TRUCKRU' then
+
+			else
+
+			end
+		end		
+	end	
+
+	local weaponTransportGroupToAdd = { ['groupName'] = hostGroup, ['groupCargo'] = {}}
+	table.insert(weaponTransports,weaponTransportGroupToAdd)
+end
+
 
 function determineRandomSquad(hostVehicle)
 	countryId = Unit.getByName(hostVehicle):getCountry()
@@ -1024,6 +1201,8 @@ function determineRandomSquad(hostVehicle)
 					initializeTransport(hostVehicle,russianSquadAntiAirMTLB)
 				end
 			end			
+		else
+			initializeTransport(hostVehicle,randomizedSquadForTransport(vehichleType,nil,countryId))
 		end --END vehichle type if for east	
 	else --West
 		if vehichleType == 'M-2 Bradley' or vehichleType == 'Marder' or vehichleType == 'MCV-80' then
@@ -1085,6 +1264,8 @@ function determineRandomSquad(hostVehicle)
 			else
 				initializeTransport(hostVehicle,gerSquadManpadsTPz)
 			end		
+		else
+			initializeTransport(hostVehicle,randomizedSquadForTransport(vehichleType,nil,countryId))
 		end --END vehichle type if for west
 	end --END country type
 
@@ -1190,32 +1371,45 @@ function mechanizeAll(optionsList)
 	end
 
 	local units = mist.makeUnitTable({'[all][vehicle]'})
+	local ignoreVehicleList = dismountsOptions['VehiclesToIgnore']
+
 	for i=1,#units do
-		local unit = Unit.getByName(units[i])
-		if unit ~= nil then
-			local unitType = unit:getTypeName()
-			if unitType == 'BTR-80' or unitType == 'BMP-2' or unitType == 'BMP-3' or unitType == 'BMP-1' or unitType == 'BTR-82A' or
-			unitType == 'BMD-1' or unitType == 'BTR_D' or unitType == 'MTLB' or unitType == 'M-2 Bradley' or unitType == 'Marder' or 
-			unitType == 'MCV-80' or unitType == 'LAV-25' or unitType == 'M-113' or unitType == 'M1126 Stryker ICV' or unitType == 'AAV7'
-			or unitType == 'M 818' or unitType == 'KAMAZ Truck' or unitType == 'GAZ-66' or unitType == 'TPZ' or unitType == 'ZBD04A' then		
-				determineRandomSquad(units[i])
-			end
-			
-			if dismountsOptions["WWIIAssets"] == true then				
-				if unitType == 'Blitz_36-6700A' or unitType == 'Sd_Kfz_251' or unitType == 'Sd_Kfz_7'
-					or unitType == 'Bedford_MWD' or unitType == 'CCKW_353' or unitType == 'M2A1_halftrack'
-				then					
-					determineRandomSquad(units[i])
+		local isVehicleInIgnoreList = false
+		if #ignoreVehicleList > 0 then
+			for ignoreItem = 1, #ignoreVehicleList do
+				if ignoreVehicleList[ignoreItem] == units[i] then
+					isVehicleInIgnoreList = true
 				end
 			end
+		end
 
-			if dismountsOptions["FrenchPack"] == true then				
-				if unitType == 'VBCI' or unitType == 'VAB_50' or unitType == 'VIB_VBR'
+		if isVehicleInIgnoreList == false then
+			local unit = Unit.getByName(units[i])
+			if unit ~= nil then
+				local unitType = unit:getTypeName()
+				if unitType == 'BTR-80' or unitType == 'BMP-2' or unitType == 'BMP-3' or unitType == 'BMP-1' or unitType == 'BTR-82A' or
+					unitType == 'BMD-1' or unitType == 'BTR_D' or unitType == 'MTLB' or unitType == 'M-2 Bradley' or unitType == 'Marder' or 
+					unitType == 'MCV-80' or unitType == 'LAV-25' or unitType == 'M-113' or unitType == 'M1126 Stryker ICV' or unitType == 'AAV7'
+					or unitType == 'M 818' or unitType == 'KAMAZ Truck' or unitType == 'GAZ-66' or unitType == 'TPZ' or unitType == 'ZBD04A' then		
+					determineRandomSquad(units[i])
+				end
+			
+				if dismountsOptions["WWIIAssets"] == true then				
+					if unitType == 'Blitz_36-6700A' or unitType == 'Sd_Kfz_251' or unitType == 'Sd_Kfz_7'
+					or unitType == 'Bedford_MWD' or unitType == 'CCKW_353' or unitType == 'M2A1_halftrack'
+					then					
+						determineRandomSquad(units[i])
+					end
+				end
+
+				if dismountsOptions["FrenchPack"] == true then				
+					if unitType == 'VBCI' or unitType == 'VAB_50' or unitType == 'VIB_VBR'
 					or unitType == 'VBAE' or unitType == 'VBAE_MMP' or unitType == 'VBL50'
 					or unitType == 'VBLANF1' or unitType == 'TRM2000' or unitType == 'VAB_RADIO'
 					or unitType == 'VBL-Radio'
-				then					
-					determineRandomSquad(units[i])
+					then					
+						determineRandomSquad(units[i])
+					end
 				end
 			end
 		end
@@ -1353,8 +1547,8 @@ local function spawnSquad(hostVehicle)
 				vehiclesList[i] = {
 						["y"] = dmVec2.y,
 						["type"] = transportVehicle.cargo[i],
-						["name"] = "Dismounts_" .. hostVehicle .. "_01",
-						["unitId"] = carrierUnitID + 10000,
+						["name"] = "Dismounts_" .. hostVehicle .. "_" .. i,
+						["unitId"] = "Dismounts_" .. hostVehicle .. '(' .. transportVehicle.cargo[i] .. ')',
 						["heading"] = 0,
 						["playerCanDrive"] = true,
 						["skill"] = "Average",
