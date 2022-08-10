@@ -893,9 +893,11 @@ local function createTargetPoint(groupName,waypointsPos3,radiusOfAttack)
 end
 
 --This is for when there is no country specific squad type definition for given vehicle is available, in that case, we will create a random squad based on countryID being east/insurgent/west, as well as the squad having a manpad or being rifle only
-local function randomizedSquadForTransport(transportType, squadType, countryID)
+local function randomizedSquadForTransport(transportType, squadType, countryID, troopCount)
 	local troopNumber = 7 --default to 7
-	if transportCapacities[transportType] ~= nil then --if it is a vehicle we know the troop capacity of, then use that instead
+	if troopCount ~= nil then --if a certain number for transports is provided in troopCount parameter, use that
+		troopNumber = troopCount
+	elseif transportCapacities[transportType] ~= nil then --if not, and if it is a vehicle we know the troop capacity of, then use that instead
 		troopNumber = transportCapacities[transportType]
 	end
 	if squadType == nil then
@@ -1384,13 +1386,13 @@ function mechanizeAll(optionsList)
 		end
 
 		if isVehicleInIgnoreList == false then
-			local unit = Unit.getByName(units[i])
+			local unit = Unit.getByName(units[i])					
 			if unit ~= nil then
 				local unitType = unit:getTypeName()
 				if unitType == 'BTR-80' or unitType == 'BMP-2' or unitType == 'BMP-3' or unitType == 'BMP-1' or unitType == 'BTR-82A' or
 					unitType == 'BMD-1' or unitType == 'BTR_D' or unitType == 'MTLB' or unitType == 'M-2 Bradley' or unitType == 'Marder' or 
 					unitType == 'MCV-80' or unitType == 'LAV-25' or unitType == 'M-113' or unitType == 'M1126 Stryker ICV' or unitType == 'AAV7'
-					or unitType == 'M 818' or unitType == 'KAMAZ Truck' or unitType == 'GAZ-66' or unitType == 'TPZ' or unitType == 'ZBD04A' then		
+					or unitType == 'M 818' or unitType == 'KAMAZ Truck' or unitType == 'GAZ-66' or unitType == 'TPZ' or unitType == 'ZBD04A' or string.sub(units[i],1,11) == 'TRANSPORT##' then		
 					determineRandomSquad(units[i])
 				end
 			
@@ -1415,6 +1417,29 @@ function mechanizeAll(optionsList)
 		end
 	end
 end
+
+function addTransportType(transportType, troopCapacity)
+	local units = mist.makeUnitTable({'[all][vehicle]'})
+	local ignoreVehicleList = dismountsOptions['VehiclesToIgnore']
+
+	for i=1,#units do
+		local isVehicleInIgnoreList = false
+		if #ignoreVehicleList > 0 then
+			for ignoreItem = 1, #ignoreVehicleList do
+				if ignoreVehicleList[ignoreItem] == units[i] then
+					isVehicleInIgnoreList = true
+				end
+			end
+		end
+		vehichleType = Unit.getByName(units[i]):getTypeName()
+
+		if isVehicleInIgnoreList == false and vehichleType == transportType then					
+			countryId = Unit.getByName(units[i]):getCountry()
+			initializeTransport(units[i],randomizedSquadForTransport('',nil,countryId,troopCapacity))
+		end
+	end
+end
+
 
 
 local function spawnSquad(hostVehicle)
