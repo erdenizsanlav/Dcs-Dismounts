@@ -49,7 +49,7 @@ transportCapacities =
 	["AAV7"] = 21,
 	["TPZ"] = 10,
 	["MTLB"] = 11,
-	["M 818"] = 7,
+	--["M 818"] = 7,
 }
 
 
@@ -701,34 +701,34 @@ ukRapierSite =
 {
 	["RDR"] = 
 	{
-		["vehicleName"] = "",
+		["vehicleName"] = {"",
 		"",
 		"",
-		"",
+		"",}
 	},
 	["OPT"] =
 	{
-		["vehicleName"] = "",
+		["vehicleName"] = {"",
 		"",
 		"",
-		"",
+		"",}
 	},
 	["MSL"] =
 	{
-		["vehicleName"] = "",
+		["vehicleName"] = {"",
 		"",
 		"",
-		"",
+		"",}
 	},
 	["STF"] =
 	{
-		["vehicleName"] = "",
+		["vehicleName"] = {"",
 		"",
 		"",
 		"",
 		"",
 		"",
-		"",
+		"",}
 	},
 }
 
@@ -756,6 +756,103 @@ ruAAASite =
 	},
 }
 
+weaponSiteTemplate =
+{
+	["SpawnedUnitType"] = "",
+	["SpawnerTransportTypes"] = {"",""},
+	["SetupTime"] = 0,
+	["WorkerCount"] = 0,
+	["CarrierVehicleNamePrefix"] = ""
+}
+
+weaponSiteTransportItemTemplate =
+{
+	["TransportingVehicleName"] = "",	
+	["TransportedItem"] = "",	
+	["WorkerCount"] = 0,
+}
+
+ruAAASiteTemplate =
+{
+	["RDR"] =
+	{
+		["SpawnedUnitType"] = "SON_9",
+		["SpawnerTransportTypes"] = {"TRUCKRU"},
+		["SetupTime"] = 5,
+		["WorkerCount"] = 4,
+		["CarrierVehicleNamePrefix"] = "RDR"
+	},
+	["KS19s"] =
+	{
+		["SpawnedUnitType"] = "KS-19",
+		["SpawnerTransportTypes"] = {"TRUCKRU"},
+		["SetupTime"] = 5,
+		["WorkerCount"] = 4,
+		["CarrierVehicleNamePrefix"] = "KS"
+	["S60s"] =
+	{
+		["SpawnedUnitType"] = "S-60_Type59_Artillery",
+		["SpawnerTransportTypes"] = {"TRUCKRU"},
+		["SetupTime"] = 5,
+		["WorkerCount"] = 2,
+		["CarrierVehicleNamePrefix"] = "S60"
+	},
+	["ZU23s"] =
+	{
+		["SpawnedUnitType"] = "ZU-23 Emplacement",
+		["SpawnerTransportTypes"] = {"TRUCKRU"},
+		["SetupTime"] = 5,
+		["WorkerCount"] = 2,
+		["CarrierVehicleNamePrefix"] = "ZU"
+	},
+	["STF"] =
+	{
+		["SpawnedUnitType"] = "SQ_russianModernSquadBTR_BMP2_BMP3",
+		["SpawnerTransportTypes"] = {"TRUCKRU","BMP-1","BMP-2","BTR-80","UAZ"},
+		["SetupTime"] = 0,
+		["WorkerCount"] = 0,
+		["CarrierVehicleNamePrefix"] = "STF"
+	},
+}
+
+ukRapierSiteTemplate = 
+{
+	["RDR"] =
+	{
+		["SpawnedUnitType"] = "rapier_fsa_blindfire_radar",
+		["SpawnerTransportTypes"] = {"Land_Rover_101_FC"},
+		["SetupTime"] = 5,
+		["WorkerCount"] = 2,
+		["CarrierVehicleNamePrefix"] = "RDR"
+	},
+	["OPT"] =
+	{
+		["SpawnedUnitType"] = "rapier_fsa_optical_tracker_unit",
+		["SpawnerTransportTypes"] = {"Land_Rover_101_FC"},
+		["SetupTime"] = 5,
+		["WorkerCount"] = 2,
+		["CarrierVehicleNamePrefix"] = "OPT"
+	},
+	["MSL"] =
+	{
+		["SpawnedUnitType"] = "rapier_fsa_launcher",
+		["SpawnerTransportTypes"] = {"Land_Rover_101_FC"},
+		["SetupTime"] = 5,
+		["WorkerCount"] = 2,
+		["CarrierVehicleNamePrefix"] = "MSL"
+	},
+	["STF"] =
+	{
+		["SpawnedUnitType"] = "SQ_usaSquadManpadsLAV25",
+		["SpawnerTransportTypes"] = {"Land_Rover_101_FC","Land_Rover_109_S3"},
+		["SetupTime"] = 0,
+		["WorkerCount"] = 0,
+		["CarrierVehicleNamePrefix"] = "STF"
+	},
+}
+
+missionWeaponSiteTransports = {}
+
 --END Weapon sites
 
 
@@ -767,7 +864,8 @@ dismountsOptions =
 	['FrenchPack'] = false,
 	['TroopsFollowSlowTransport'] = false,
 	['GorgeousGeorgians'] = false,
-	['VehiclesToIgnore'] = {}
+	['VehiclesToIgnore'] = {},
+	['RandomizeRussianTroops'] = false,
 }
 
 function setOptions(optionsList)
@@ -789,6 +887,15 @@ function georgify(origSquad)
 	end
 	return newSquad
 end
+
+function randomizeRussianTroops(origSquad)
+	-- TO BE IMPLEMENTED
+end
+
+function randomizeInsurgentManpads(origSquad)
+	-- TO BE IMPLEMENTED
+end
+
 
 local function checkForMarkers(hostVehicle)
 	--local markersForUnit = mist.marker.get(hostVehicle)
@@ -892,7 +999,7 @@ local function createTargetPoint(groupName,waypointsPos3,radiusOfAttack)
 	Group.getByName(groupDismounts):getController():setTask(tgt)
 end
 
---This is for when there is no country specific squad type definition for given vehicle is available, in that case, we will create a random squad based on countryID being east/insurgent/west, as well as the squad having a manpad or being rifle only
+--This is for when there is no country specific squad type definition for given vehicle is available, or when you want to populate a vehicle that isn't supported in the script by default. In that case, we will create a random squad based on countryID being east/insurgent/west, as well as the squad having a manpad or being rifle only
 local function randomizedSquadForTransport(transportType, squadType, countryID, troopCount)
 	local troopNumber = 7 --default to 7
 	if troopCount ~= nil then --if a certain number for transports is provided in troopCount parameter, use that
@@ -960,34 +1067,67 @@ local function initializeTransport(unitName,cargoSquad)
 	}
 end
 
+local function checkTransportForWeaponSite(transportType, allowedTypes)
+	local fits = false
+	for i=1,#allowedTypes do
+		if allowedTypes[i] == transportType then
+			return true
+		elseif allowedTypes[i] == "TRUCKRU" and transportType == "GAZ-66" or transportType == "KAMAZ Truck" then
+			return true
+		end
+	end
+	return fits
+end
+
+
 function assignWeaponTransports(hostGroup,cargoType)
 	local transportGroup = Group.getByName(hostGroup)
 	local unitsInGroup = transportGroup:getUnits()
 	local unitsWithCargo = {}
-	local weaponTransportType = {}
+	local setupTicksMax = 0
+
+	--local weaponTransportType = {}
+
+	--local groupRadars = {}
+	--local groupOpticsAndCommand = {}
+	--local groupWeapons = {}
+	--local groupStaffAndInfantry = {}
+
 
 	if cargoType == 'ruAAASite' then
-		weaponTransportType = mist.utils.deepCopy(ruAAASite)
+		weaponTransportType = mist.utils.deepCopy(ruAAASiteTemplate)
 	elseif cargoType == 'ukRapierSite' then
-		weaponTransportType = mist.utils.deepCopy(ukRapierSite)
+		weaponTransportType = mist.utils.deepCopy(ukRapierSiteTemplate)
 	end
 
-	for z=1,#unitsInGroup do
+	for z=1,#unitsInGroup do 
 		local unitToProcess = Unit.getByName(unitsInGroup[z])
 		local unitType = unitToProcess:getTypeName()
-	end
+		local unitName = unitsInGroup[z]
 
-	for key,value in pairs(weaponTransportType) do
-		if key == "RDR" then
-			if value[1] == 'TRUCKRU' then
-
-			else
-
+		for key,value in pairs(weaponTransportType) do
+			local notYetAssigned = true
+			if notYetAssigned == true and (string.sub(unitName,1,#key) == key or checkTransportForWeaponSite(unitType,value["SpawnerTransportTypes"])) then
+				notYetAssigned = false
+				local itemToAdd = {
+					['TransportingVehicleName'] = unitName
+					['TransportedItem'] = value['SpawnedUnitType']
+					['WorkerCount'] = value['WorkerCount']
+				}
+				table.insert(unitsWithCargo,itemToAdd)
+				if value['SetupTime'] > setupTicksMax then
+					setupTicksMax = value['SetupTime']
+				end
+				--Add the vehicle to "ignore to add squads into" list if any auto populate function is called after this one, then remove it from dismounts list if it was already populated with troops
+				table.insert(dismountsOptions['VehiclesToIgnore'],unitName)
+				if missionTransports[unitName] ~= nil then
+					missionTransports[unitName] = nil
+				end
 			end
 		end		
-	end	
+	end
 
-	local weaponTransportGroupToAdd = { ['groupName'] = hostGroup, ['groupCargo'] = {}}
+	local weaponTransportGroupToAdd = { ['groupName'] = hostGroup, ['SetupTicksLeft'] = setupTicksMax, ['groupCargo'] = unitsWithCargo}
 	table.insert(weaponTransports,weaponTransportGroupToAdd)
 end
 
@@ -1440,10 +1580,58 @@ function addTransportType(transportType, troopCapacity)
 	end
 end
 
+function spawnTransportWorkers(groupName)
+	local countryId = Group.getByName(groupName):getUnit(1):getCountry()
+	local soldierType = "Infantry AK" --default red, Russian soldier
+
+	if countryId == 17 then --insurgents
+		soldierType = "Infantry AK Ins"
+	elseif (countryId > 1 and countryId < 16 and countryId ~= 7) then --blue
+		soldierType = "Soldier M4"
+	end
+
+	for i=1,#weaponTransports do
+		if weaponTransports[i]["groupName"] == groupName then
+			for cargoIndex = 0,#weaponTransports[i]["groupCargo"] do
+				local workerSquad = {}
+				local transportName = weaponTransports[i]["groupCargo"][cargoIndex]["TransportingVehicleName"]
+				local workersToSpawn = 0
+
+				if Unit.getByName(transportName) ~= nil then
+					if string.sub(weaponTransports[i]["groupCargo"][cargoIndex]["TransportedItem"],1,3) == 'SQ_' then
+						spawnSquad(transportName,string.sub(weaponTransports[i]["groupCargo"][cargoIndex]["TransportedItem"],3))
+					else
+						workersToSpawn = weaponTransports[i]["groupCargo"][cargoIndex]["WorkerCount"]
+						for idx = 1, #workersToSpawn do
+							table.insert(workerSquad,soldierType)
+						end
+						spawnSquad(transportName,workerSquad)
+					end
+				else
+					trigger.action.outText('So the unit ' .. transportName .. ' is apparently DED... DEADEDED',5)
+				end
+			end
+		end
+	end
+end
+
+function spawnWeaponSite(groupName)
+	-- body
+end
 
 
-local function spawnSquad(hostVehicle)
-	transportVehicle = missionTransports[hostVehicle]	
+
+local function spawnSquad(hostVehicle,alternateCargo)
+	transportVehicle = missionTransports[hostVehicle]
+
+	if alternateCargo ~= nil then
+		transportVehicle = 
+		{
+			countryID = Unit.getByName(hostVehicle):getCountry(),
+			UnitID = Unit.getByName(hostVehicle):getID(),
+			cargo = alternateCargo
+		}
+	end
 
 	if transportVehicle ~= nil then
 		local dismountingTransport = Unit.getByName(hostVehicle)
@@ -1644,6 +1832,7 @@ local function checkMovement()
 		end
 	end
 
+	--ASSIGN ROUTES/TASKS FROM F10 MARKERS
 	--trigger.action.outText('grouops with routes are numbered as: '..#groupsWithRoutes,15)
 	for key, value in pairs(groupsWithRoutes) do
 		local dismountedGroupName = 'Dismounts_' .. key
@@ -1678,6 +1867,38 @@ local function checkMovement()
 	for i=1,#removeRoutesUpdated do
 		groupsWithRoutesUpdated[removeRoutesUpdated[i]] = nil
 	end
+	--END ASSIGN ROUTES/TASKS FROM F10 MARKERS
+
+	--CHECK FOR WEAPON SITE TRANSPORTS
+	if #weaponTransports > 0 then
+		for i=1,#weaponTransports do
+			if weaponTransports[i]["SetupTicksLeft"] > 0 then
+				--TODO: first check if the first unit that is alive has stopped or not
+				local leaderVhc = Group.getByName(groupTransportingWeaponSite):getUnit(1)
+				local vel = leaderVhc:getVelocity()
+				local speed = mist.vec.mag(v)
+				local leaderPos = leaderVhc:getPosition()
+				local groupTransportingWeaponSite = weaponTransports[i]["groupName"]
+			
+				if speed < 1 then --Check if lead vehicle from our weapon site tranport column is stopped
+					--if so, let's see if it is near the group's final waypoint
+					local groupPath = mist.getGroupPoints(groupTransportingWeaponSite)
+					local distanceToFinalWP = mist.utils.get2DDist(leaderPos,groupPath[#groupPath])
+					if distanceToFinalWP < 101 then
+						--spawn the "worker" infantry first TODO
+						spawnTransportWorkers(groupTransportingWeaponSite)
+						--then start the ticks countdown
+						weaponTransports[i]["SetupTicksLeft"] = weaponTransports[i]["SetupTicksLeft"] - 1
+					end
+				end
+			elseif weaponTransports[i]["SetupTicksLeft"] == 0 then
+				--start spawning!
+				weaponTransports[i]["SetupTicksLeft"] = -1 --started spawning, don't keep doing it over and over again shall we?
+				spawnWeaponSite(weaponTransports[i]["groupName"])
+			end
+		end
+	end
+	--END CHECK FOR WEAPON SITE TRANSPORTS
 
 	return timer.getTime() + 5
 end
@@ -1705,10 +1926,10 @@ local function sanitizeMarkers(markerText, markerId)
 		--Check if the marker is created by a player from same side as the unit
 		local unitCoalition = Unit.getByName(unitName):getCoalition()
 		if currentMarker.coalition ~= unitCoalition then
-			trigger.action.outText('scheisse! wrongg faction, wir haben eine SPYYY', 15)
-			trigger.action.outText('faction unit: ' .. unitCoalition, 15)
+			--trigger.action.outText('scheisse! wrongg faction, wir haben eine SPYYY', 15)
+			--trigger.action.outText('faction unit: ' .. unitCoalition, 15)
 			--trigger.action.outText('faction marker: ' .. currentMarker.coalition, 15)
-			trigger.action.outText(mist.utils.tableShow(currentMarker),15)
+			--trigger.action.outText(mist.utils.tableShow(currentMarker),15)
 			mist.marker.remove(markerId)
 			return 0
 		end
@@ -1720,14 +1941,14 @@ local function sanitizeMarkers(markerText, markerId)
 					mist.marker.remove(markers[i].idx)				
 				else
 					table.insert(markerIdForWP, markers[i])
-					trigger.action.outText("Marker's side was: " .. markers[i].coalition ,15)
-					trigger.action.outText("Marker's initiator was: " .. markers[i].author ,15)
+					--trigger.action.outText("Marker's side was: " .. markers[i].coalition ,15)
+					--trigger.action.outText("Marker's initiator was: " .. markers[i].author ,15)
 				end
 			end
 		else
 			table.insert(markerIdForWP, markers[1])
-			trigger.action.outText("Marker's side was: " .. markers[1].coalition ,15)
-			trigger.action.outText("Marker's initiator was: " .. markers[1].author ,15)
+			--trigger.action.outText("Marker's side was: " .. markers[1].coalition ,15)
+			--trigger.action.outText("Marker's initiator was: " .. markers[1].author ,15)
 		end
 		
 		if mkrPfx == 'infWP' then
