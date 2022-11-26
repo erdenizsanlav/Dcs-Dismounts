@@ -25,6 +25,7 @@ local missionTransports = {}
 local weaponTransports = {}
 local groupsWithRoutes = {}
 local groupsWithRoutesUpdated = {}
+local removeFromWeaponTransports = {}
 dismountsInitiated = 0
 
 transportCapacities = 
@@ -1112,7 +1113,7 @@ function assignWeaponTransports(hostGroup,cargoType)
 	end	
 
 	for transportedItemType, transportedItemInfo in pairs(weaponTransportType) do
-		if dismountsOptions["WPNSitesAddMoreWPNToFreeVehicles"] == true and (transportedItemType ~= "RDR" or transportedItemType ~= "OPT") then
+		if dismountsOptions["WPNSitesAddMoreWPNToFreeVehicles"] == true and (transportedItemType ~= "RDR" and transportedItemType ~= "OPT") then
 			table.insert(nonSensorCargoTypesInTemplate,transportedItemInfo)
 		end
 		
@@ -1174,15 +1175,32 @@ function assignWeaponTransports(hostGroup,cargoType)
 						break
 					end
 				elseif dismountsOptions["WPNSitesAddMoreWPNToFreeVehicles"] == true and #nonSensorCargoTypesInTemplate > 0 then --and (cargoInfo["CarrierVehicleNamePrefix"] ~= "RDR" or cargoInfo["CarrierVehicleNamePrefix"] ~= "OPT") then
-					local seed = mist.random(1,#nonSensorCargoTypesInTemplate)
-					itemToAdd = {
-						['TransportingVehicleName'] = unitName,
-						['TransportedItem'] = nonSensorCargoTypesInTemplate[seed]['SpawnedUnitType'],
-						['WorkerCount'] = nonSensorCargoTypesInTemplate[seed]['WorkerCount'],
-						['WorkerStatus'] = 0
-					}
-					alreadyLoadedVehicles[unitName] = nonSensorCargoTypesInTemplate[seed]['SpawnedUnitType']
-					break
+					if alreadyLoadedVehicles[unitName] == nil then
+						--first, let's decide whether we'll give this particular vehicle any cargo or not
+						local emptyOrFull = mist.random(1,10)
+						if emptyOrFull < 8 then
+							break
+						end
+						--now we can go about giving this particular vehicle some random goodies, consideration for future: make vehicle type suitability check for the cargo!!
+						local seed = mist.random(1,#nonSensorCargoTypesInTemplate)
+						itemToAdd = {
+							['TransportingVehicleName'] = unitName,
+							['TransportedItem'] = nonSensorCargoTypesInTemplate[seed]['SpawnedUnitType'],
+							['WorkerCount'] = nonSensorCargoTypesInTemplate[seed]['WorkerCount'],
+							['WorkerStatus'] = 0
+						}
+						table.insert(unitsWithCargo,itemToAdd)
+						if nonSensorCargoTypesInTemplate[seed]['SetupTime'] > setupTicksMax then
+							setupTicksMax = nonSensorCargoTypesInTemplate[seed]['SetupTime']
+						end
+						--Add the vehicle to "ignore to add squads into" list if any auto populate function is called after this one, then remove it from dismounts list if it was already populated with troops
+						table.insert(dismountsOptions['VehiclesToIgnore'],unitName)
+						if missionTransports[unitName] ~= nil then
+							missionTransports[unitName] = nil
+						end
+						alreadyLoadedVehicles[unitName] = nonSensorCargoTypesInTemplate[seed]['SpawnedUnitType']
+						break
+					end
 				end
 			end
 		end
@@ -1190,6 +1208,10 @@ function assignWeaponTransports(hostGroup,cargoType)
 
 	local weaponTransportGroupToAdd = { ['groupName'] = hostGroup, ['SetupTicksLeft'] = setupTicksMax, ['groupCargo'] = unitsWithCargo}
 	table.insert(weaponTransports,weaponTransportGroupToAdd)
+
+	if #weaponTransports > 1 then
+		trigger.action.outText(mist.utils.tableShow(weaponTransports),15)
+	end
 end
 
 
@@ -1649,7 +1671,7 @@ function spawnWeaponSite(groupName)
 	local groupDismounting = Group.getByName(groupName)		
 	local countryId = 0
 
-	trigger.action.outText(groupName,15)	
+	trigger.action.outText('spawning weapon site from group: ' .. groupName,15)	
 	
 	if groupDismounting ~= nil then
 		countryId = groupDismounting:getUnit(1):getCountry()
@@ -1739,10 +1761,9 @@ function spawnWeaponSite(groupName)
 	
 	--spawn their cargo at the location of worker infantry, but only if worker infantry is still alive
 	coalition.addGroup(countryId, Group.Category.GROUND, newGroup)
-	table.remove(weaponTransports,weaponTransportsId)	
+	--table.remove(weaponTransports,weaponTransportsId)
+	table.insert(removeFromWeaponTransports,groupName)
 end
-
-
 
 local function spawnSquad(hostVehicle,alternateCargo,initialWPVec2)
 	transportVehicle = missionTransports[hostVehicle]
@@ -2042,6 +2063,16 @@ local function checkMovement()
 				spawnWeaponSite(weaponTransports[i]["groupName"])
 			end
 		end
+	end
+	if #removeFromWeaponTransports > 0 then
+		for toRemoveTransportsIdx=1,#removeFromWeaponTransports do
+			for wpnTransportIdx = #weaponTransports, 1, -1 do
+				if weaponTransports[wpnTransportIdx]["groupName"] == removeFromWeaponTransports[toRemoveTransportsIdx] then
+					table.remove(weaponTransports,wpnTransportIdx)
+				end
+			end
+		end
+		removeFromWeaponTransports = {}
 	end
 	--END CHECK FOR WEAPON SITE TRANSPORTS
 
