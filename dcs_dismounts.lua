@@ -698,72 +698,14 @@ ukRapierSiteTransport =
 --END Transports for weapon positions
 
 --Weapon sites
-ukRapierSite =
-{
-	["RDR"] = 
-	{
-		["vehicleName"] = {"",
-		"",
-		"",
-		"",}
-	},
-	["OPT"] =
-	{
-		["vehicleName"] = {"",
-		"",
-		"",
-		"",}
-	},
-	["MSL"] =
-	{
-		["vehicleName"] = {"",
-		"",
-		"",
-		"",}
-	},
-	["STF"] =
-	{
-		["vehicleName"] = {"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",}
-	},
-}
-
-ruAAASite =
-{
-	["RDR"] =
-	{
-		["vehicleNames"] = {'TRUCKRU'}
-	},
-	["KS19s"] =
-	{
-		["vehicleNames"] = {'TRUCKRU'}
-	},
-	["S60s"] =
-	{
-		["vehicleNames"] = {'TRUCKRU'}
-	},
-	["ZU23s"] =
-	{
-		["vehicleNames"] = {'TRUCKRU'}
-	},
-	["STF"] =
-	{
-		["vehicleNames"] = {'UTILRU'}
-	},
-}
-
 weaponSiteTemplate =
 {
-	["SpawnedUnitType"] = "",
-	["SpawnerTransportTypes"] = {"",""},
-	["SetupTime"] = 0,
-	["WorkerCount"] = 0,
-	["CarrierVehicleNamePrefix"] = ""
+	["SpawnedUnitType"] = "",				-- Unit Type string for the type of unit to spawn after setup time (SAM launcher or radar, AA gun, field gun etc)
+	["SpawnerTransportTypes"] = {"",""},	-- Suitable vehicle types for the script to assign this cargo to
+	["SetupTime"] = 0,						-- How many ticks does it take to deploy this system from the transport (ticks are 5 secs each)
+	["WorkerCount"] = 0,					-- How many riflemen will spawn when the deployment sequence starts before the system is deployed
+	["CarrierVehicleNamePrefix"] = "",		-- If a vehicle in the group has a name starting with this prefix, this cargo type will be added to it
+	["Optional"] = false,					-- If true, the script will not populate any vehicle with this cargo type, unless vehicle name is assigned it through use of above prefix
 }
 
 weaponSiteTransportItemTemplate =
@@ -853,6 +795,50 @@ ukRapierSiteTemplate =
 	},
 }
 
+ww2GerLeFHSiteTemplate =
+{
+	["GUN1"] =
+	{
+		["SpawnedUnitType"] = "LeFH_18-40-105",
+		["SpawnerTransportTypes"] = {"Blitz_36-6700A","Sd_Kfz_7"},
+		["SetupTime"] = 5,
+		["WorkerCount"] = 4,
+		["CarrierVehicleNamePrefix"] = "GUN"
+	},
+	["GUN2"] =
+	{
+		["SpawnedUnitType"] = "LeFH_18-40-105",
+		["SpawnerTransportTypes"] = {"Blitz_36-6700A","Sd_Kfz_7"},
+		["SetupTime"] = 5,
+		["WorkerCount"] = 4,
+		["CarrierVehicleNamePrefix"] = "GN2"
+	},
+	["GUN3"] =
+	{
+		["SpawnedUnitType"] = "LeFH_18-40-105",
+		["SpawnerTransportTypes"] = {"Blitz_36-6700A","Sd_Kfz_7"},
+		["SetupTime"] = 5,
+		["WorkerCount"] = 4,
+		["CarrierVehicleNamePrefix"] = "GN3"
+	},
+	["GUN4"] =
+	{
+		["SpawnedUnitType"] = "LeFH_18-40-105",
+		["SpawnerTransportTypes"] = {"Blitz_36-6700A","Sd_Kfz_7"},
+		["SetupTime"] = 5,
+		["WorkerCount"] = 4,
+		["CarrierVehicleNamePrefix"] = "GN4"
+	},
+	["STF"] =
+	{
+		["SpawnedUnitType"] = "SQ_ww2Wehrmacht",
+		["SpawnerTransportTypes"] = {"Blitz_36-6700A","Sd_Kfz_251"},
+		["SetupTime"] = 0,
+		["WorkerCount"] = 0,
+		["CarrierVehicleNamePrefix"] = "STF"
+	},
+}
+
 missionWeaponSiteTransports = {}
 
 --END Weapon sites
@@ -927,6 +913,13 @@ local function replaceManpadsWithRiflemen(squad)
 	return squad
 end
 
+function newCoordFromDistanceBearing(initPosVec2,bearing,dist)
+	local bearingRad = math.rad(bearing)
+	local dept = dist * math.sin(bearingRad)
+	local lat = dist * math.cos(bearingRad)
+
+	return { x= initPosVec2.x + dept, y = initPosVec2.y + lat }
+end
 
 
 local function checkForMarkers(hostVehicle)
@@ -982,6 +975,17 @@ local function addWaypointToGroup(groupName,waypointsPos3)
 	table.insert(squadPath,wpToAdd)
 	mist.goRoute(groupDismounts,squadPath)
 end
+
+local function addWaypointToVehicles(groupName,waypointVec2)
+	local squadPath = {}	
+	squadPath[1] = mist.ground.buildWP(mist.getLeadPos(groupName))
+
+	local wpToAdd = mist.ground.buildWP(waypointVec2)
+	
+	table.insert(squadPath,wpToAdd)
+	mist.goRoute(groupName,squadPath)
+end
+
 
 local function createTargetPoint(groupName,waypointsPos3,radiusOfAttack)
 	local radiusOfBoom = 5
@@ -1083,7 +1087,7 @@ local function checkTransportForWeaponSite(transportType, allowedTypes)
 	for i=1,#allowedTypes do
 		if allowedTypes[i] == transportType then
 			return true
-		elseif allowedTypes[i] == "TRUCKRU" and transportType == "GAZ-66" or transportType == "KAMAZ Truck" then
+		elseif allowedTypes[i] == "TRUCKRU" and (transportType == "GAZ-66" or transportType == "KAMAZ Truck") then
 			return true
 		end
 	end
@@ -1097,7 +1101,7 @@ function assignWeaponTransports(hostGroup,cargoType)
 	local unitsWithCargo = {}
 	local setupTicksMax = 0
 
-	--local weaponTransportType = {}
+	local weaponTransportType = {}
 
 	--local groupRadars = {}
 	--local groupOpticsAndCommand = {}
@@ -1106,11 +1110,15 @@ function assignWeaponTransports(hostGroup,cargoType)
 	local alreadyLoadedVehicles = {} --key = vehicle name, value = cargo
 	local nonSensorCargoTypesInTemplate = {}
 
-	if cargoType == 'ruAAASite' then
-		weaponTransportType = mist.utils.deepCopy(ruAAASiteTemplate)
-	elseif cargoType == 'ukRapierSite' then
-		weaponTransportType = mist.utils.deepCopy(ukRapierSiteTemplate)
-	end	
+	local templateType = cargoType .. 'Template'
+	if templateType == 'ww2GerLeFHSiteTemplate' and dismountsOptions['WWIIAssets'] == false then
+		trigger.action.outText('NON!!',15)
+		return 0
+	end
+
+	trigger.action.outText(templateType,15)
+	weaponTransportType = mist.utils.deepCopy(_G[templateType])
+	trigger.action.outText(mist.utils.tableShow(weaponTransportType),15)
 
 	for transportedItemType, transportedItemInfo in pairs(weaponTransportType) do
 		if dismountsOptions["WPNSitesAddMoreWPNToFreeVehicles"] == true and (transportedItemType ~= "RDR" and transportedItemType ~= "OPT") then
@@ -1671,7 +1679,7 @@ function spawnWeaponSite(groupName)
 	local groupDismounting = Group.getByName(groupName)		
 	local countryId = 0
 
-	trigger.action.outText('spawning weapon site from group: ' .. groupName,15)	
+	--trigger.action.outText('spawning weapon site from group: ' .. groupName,15)	
 	
 	if groupDismounting ~= nil then
 		countryId = groupDismounting:getUnit(1):getCountry()
@@ -1679,7 +1687,7 @@ function spawnWeaponSite(groupName)
 		return false
 	end
 
-	trigger.action.outText(mist.utils.tableShow(groupDismounting),15)
+	--trigger.action.outText(mist.utils.tableShow(groupDismounting),15)
 	
 	--find in weaponTransports
 	local transportData = {}
@@ -1763,6 +1771,11 @@ function spawnWeaponSite(groupName)
 	coalition.addGroup(countryId, Group.Category.GROUND, newGroup)
 	--table.remove(weaponTransports,weaponTransportsId)
 	table.insert(removeFromWeaponTransports,groupName)
+	--move the column forward a bit and away from deployed things
+	local transportingGroupHdg = getHeading(Group.getByName(groupName):getUnit(1):getPosition())
+	local transportingGroupPos = mist.utils.makeVec2(Group.getByName(groupName):getUnit(1):getPoint())
+	local trasportingGroupNewPos3Wpt = newCoordFromDistanceBearing(transportingGroupPos,transportingGroupHdg,100)
+	addWaypointToVehicles(groupName,trasportingGroupNewPos3Wpt)
 end
 
 local function spawnSquad(hostVehicle,alternateCargo,initialWPVec2)
