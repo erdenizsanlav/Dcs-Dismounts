@@ -721,7 +721,7 @@ ruAAASiteTemplate =
 	{
 		["SpawnedUnitType"] = "SON_9",
 		["SpawnerTransportTypes"] = {"TRUCKRU"},
-		["SetupTime"] = 5,
+		["SetupTime"] = 60,
 		["WorkerCount"] = 4,
 		["CarrierVehicleNamePrefix"] = "RDR"
 	},
@@ -729,7 +729,7 @@ ruAAASiteTemplate =
 	{
 		["SpawnedUnitType"] = "KS-19",
 		["SpawnerTransportTypes"] = {"TRUCKRU"},
-		["SetupTime"] = 5,
+		["SetupTime"] = 60,
 		["WorkerCount"] = 4,
 		["CarrierVehicleNamePrefix"] = "KS",
 	},
@@ -737,7 +737,7 @@ ruAAASiteTemplate =
 	{
 		["SpawnedUnitType"] = "S-60_Type59_Artillery",
 		["SpawnerTransportTypes"] = {"TRUCKRU"},
-		["SetupTime"] = 5,
+		["SetupTime"] = 60,
 		["WorkerCount"] = 2,
 		["CarrierVehicleNamePrefix"] = "S60"
 	},
@@ -745,7 +745,7 @@ ruAAASiteTemplate =
 	{
 		["SpawnedUnitType"] = "ZU-23 Emplacement",
 		["SpawnerTransportTypes"] = {"TRUCKRU"},
-		["SetupTime"] = 5,
+		["SetupTime"] = 60,
 		["WorkerCount"] = 2,
 		["CarrierVehicleNamePrefix"] = "ZU"
 	},
@@ -765,7 +765,7 @@ ukRapierSiteTemplate =
 	{
 		["SpawnedUnitType"] = "rapier_fsa_blindfire_radar",
 		["SpawnerTransportTypes"] = {"Land_Rover_101_FC"},
-		["SetupTime"] = 5,
+		["SetupTime"] = 60,
 		["WorkerCount"] = 2,
 		["CarrierVehicleNamePrefix"] = "RDR"
 	},
@@ -773,7 +773,7 @@ ukRapierSiteTemplate =
 	{
 		["SpawnedUnitType"] = "rapier_fsa_optical_tracker_unit",
 		["SpawnerTransportTypes"] = {"Land_Rover_101_FC"},
-		["SetupTime"] = 5,
+		["SetupTime"] = 60,
 		["WorkerCount"] = 2,
 		["CarrierVehicleNamePrefix"] = "OPT"
 	},
@@ -781,7 +781,7 @@ ukRapierSiteTemplate =
 	{
 		["SpawnedUnitType"] = "rapier_fsa_launcher",
 		["SpawnerTransportTypes"] = {"Land_Rover_101_FC"},
-		["SetupTime"] = 5,
+		["SetupTime"] = 60,
 		["WorkerCount"] = 2,
 		["CarrierVehicleNamePrefix"] = "MSL"
 	},
@@ -801,7 +801,7 @@ ww2GerLeFHSiteTemplate =
 	{
 		["SpawnedUnitType"] = "LeFH_18-40-105",
 		["SpawnerTransportTypes"] = {"Blitz_36-6700A","Sd_Kfz_7"},
-		["SetupTime"] = 5,
+		["SetupTime"] = 60,
 		["WorkerCount"] = 4,
 		["CarrierVehicleNamePrefix"] = "GUN"
 	},
@@ -809,7 +809,7 @@ ww2GerLeFHSiteTemplate =
 	{
 		["SpawnedUnitType"] = "LeFH_18-40-105",
 		["SpawnerTransportTypes"] = {"Blitz_36-6700A","Sd_Kfz_7"},
-		["SetupTime"] = 5,
+		["SetupTime"] = 60,
 		["WorkerCount"] = 4,
 		["CarrierVehicleNamePrefix"] = "GN2"
 	},
@@ -817,7 +817,7 @@ ww2GerLeFHSiteTemplate =
 	{
 		["SpawnedUnitType"] = "LeFH_18-40-105",
 		["SpawnerTransportTypes"] = {"Blitz_36-6700A","Sd_Kfz_7"},
-		["SetupTime"] = 5,
+		["SetupTime"] = 60,
 		["WorkerCount"] = 4,
 		["CarrierVehicleNamePrefix"] = "GN3"
 	},
@@ -825,7 +825,7 @@ ww2GerLeFHSiteTemplate =
 	{
 		["SpawnedUnitType"] = "LeFH_18-40-105",
 		["SpawnerTransportTypes"] = {"Blitz_36-6700A","Sd_Kfz_7"},
-		["SetupTime"] = 5,
+		["SetupTime"] = 60,
 		["WorkerCount"] = 4,
 		["CarrierVehicleNamePrefix"] = "GN4"
 	},
@@ -833,6 +833,66 @@ ww2GerLeFHSiteTemplate =
 	{
 		["SpawnedUnitType"] = "SQ_ww2Wehrmacht",
 		["SpawnerTransportTypes"] = {"Blitz_36-6700A","Sd_Kfz_251"},
+		["SetupTime"] = 0,
+		["WorkerCount"] = 0,
+		["CarrierVehicleNamePrefix"] = "STF"
+	},
+}
+
+ww2USAAATemplate =
+{
+	["M37"] =
+	{
+		["SpawnedUnitType"] = "M1_37mm",
+		["SpawnerTransportTypes"] = {"CCKW_353"},
+		["SetupTime"] = 60,
+		["WorkerCount"] = 2,
+		["CarrierVehicleNamePrefix"] = "M37"
+	},
+	["M372"] =
+	{
+		["SpawnedUnitType"] = "M1_37mm",
+		["SpawnerTransportTypes"] = {"CCKW_353"},
+		["SetupTime"] = 60,
+		["WorkerCount"] = 2,
+		["CarrierVehicleNamePrefix"] = "M372"
+	},
+	["M45"] =
+	{
+		["SpawnedUnitType"] = "M45_Quadmount",
+		["SpawnerTransportTypes"] = {"CCKW_353"},
+		["SetupTime"] = 60,
+		["WorkerCount"] = 2,
+		["CarrierVehicleNamePrefix"] = "M45"
+	},
+	["M373"] =
+	{
+		["SpawnedUnitType"] = "M1_37mm",
+		["SpawnerTransportTypes"] = {"CCKW_353"},
+		["SetupTime"] = 60,
+		["WorkerCount"] = 2,
+		["CarrierVehicleNamePrefix"] = "M373"
+	},
+	["M451"] =
+	{
+		["SpawnedUnitType"] = "M45_Quadmount",
+		["SpawnerTransportTypes"] = {"CCKW_353"},
+		["SetupTime"] = 60,
+		["WorkerCount"] = 2,
+		["CarrierVehicleNamePrefix"] = "M451"
+	},
+	["M452"] =
+	{
+		["SpawnedUnitType"] = "M45_Quadmount",
+		["SpawnerTransportTypes"] = {"CCKW_353"},
+		["SetupTime"] = 60,
+		["WorkerCount"] = 2,
+		["CarrierVehicleNamePrefix"] = "M452"
+	},
+	["STF"] =
+	{
+		["SpawnedUnitType"] = "SQ_ww2USTroops",
+		["SpawnerTransportTypes"] = {"CCKW_353","M2A1_halftrack"},
 		["SetupTime"] = 0,
 		["WorkerCount"] = 0,
 		["CarrierVehicleNamePrefix"] = "STF"
@@ -1112,13 +1172,13 @@ function assignWeaponTransports(hostGroup,cargoType)
 
 	local templateType = cargoType .. 'Template'
 	if templateType == 'ww2GerLeFHSiteTemplate' and dismountsOptions['WWIIAssets'] == false then
-		trigger.action.outText('NON!!',15)
+		--trigger.action.outText('NON!!',15)
 		return 0
 	end
 
-	trigger.action.outText(templateType,15)
+	--trigger.action.outText(templateType,15)
 	weaponTransportType = mist.utils.deepCopy(_G[templateType])
-	trigger.action.outText(mist.utils.tableShow(weaponTransportType),15)
+	--trigger.action.outText(mist.utils.tableShow(weaponTransportType),15)
 
 	for transportedItemType, transportedItemInfo in pairs(weaponTransportType) do
 		if dismountsOptions["WPNSitesAddMoreWPNToFreeVehicles"] == true and (transportedItemType ~= "RDR" and transportedItemType ~= "OPT") then
@@ -1217,9 +1277,9 @@ function assignWeaponTransports(hostGroup,cargoType)
 	local weaponTransportGroupToAdd = { ['groupName'] = hostGroup, ['SetupTicksLeft'] = setupTicksMax, ['groupCargo'] = unitsWithCargo}
 	table.insert(weaponTransports,weaponTransportGroupToAdd)
 
-	if #weaponTransports > 1 then
-		trigger.action.outText(mist.utils.tableShow(weaponTransports),15)
-	end
+	--if #weaponTransports > 1 then
+		--trigger.action.outText(mist.utils.tableShow(weaponTransports),15)
+	--end
 end
 
 
@@ -1729,7 +1789,7 @@ function spawnWeaponSite(groupName)
 		end
 	end
 
-	trigger.action.outText(mist.utils.tableShow(transportData["groupCargo"]),15)
+	--trigger.action.outText(mist.utils.tableShow(transportData["groupCargo"]),15)
 
 	--go through still alive units
 	for vhc=1,#transportData["groupCargo"] do
@@ -1794,7 +1854,7 @@ local function spawnSquad(hostVehicle,alternateCargo,initialWPVec2)
 			cargo = alternateCargo
 		}
 
-		trigger.action.outText(mist.utils.tableShow(transportVehicle),15)
+		--trigger.action.outText(mist.utils.tableShow(transportVehicle),15)
 	end
 
 	if transportVehicle ~= nil then
@@ -2111,7 +2171,7 @@ function spawnTransportWorkers(groupName)
 
 				if Unit.getByName(transportName) ~= nil and weaponTransports[i]["groupCargo"][cargoIndex]["WorkerStatus"] == 0 then
 					if string.sub(weaponTransports[i]["groupCargo"][cargoIndex]["TransportedItem"],1,3) == 'SQ_' then
-						trigger.action.outText('STF SQ_ stuff sent',15)
+						--trigger.action.outText('STF SQ_ stuff sent',15)
 						spawnSquad(transportName,weaponTransports[i]["groupCargo"][cargoIndex]["TransportedItem"])
 						weaponTransports[i]["groupCargo"][cargoIndex]["WorkerStatus"] = 1
 					else
@@ -2129,7 +2189,7 @@ function spawnTransportWorkers(groupName)
 end
 
 local function sanitizeMarkers(markerText, markerId)
-	trigger.action.outText('Marker event hit, marker text:' .. markerText .. ' marker Id:' .. markerId, 5)
+	--trigger.action.outText('Marker event hit, marker text:' .. markerText .. ' marker Id:' .. markerId, 5)
 
 	local mkrPfx = string.sub(markerText,1,5)
 	local markers = checkForMarkers(markerText)
